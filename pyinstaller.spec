@@ -27,7 +27,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='module_template',
+    name='vehicle_tracking_configurator',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
