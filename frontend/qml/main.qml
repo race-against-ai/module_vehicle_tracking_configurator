@@ -4,7 +4,6 @@ import QtQuick.Window 2.15
 
 import "./items"
 
-//TODO: Add a test video to the configurator to test with actual footage
 //TODO: Link up the functions from the window to the backend
 
 Window {
@@ -95,7 +94,6 @@ Window {
 
                 function reload() {
                     id++;
-                    console.log("yeah boii")
                 }
             }
 
@@ -205,6 +203,14 @@ Window {
                     anchors.rightMargin: 25
                 }
             }
+        }
+    }
+
+    Connections {
+        target: vehicle_tracking_configurator_model
+
+        function onReloadImage() {
+            pointsDrawerStream.reload()
         }
     }
 }
