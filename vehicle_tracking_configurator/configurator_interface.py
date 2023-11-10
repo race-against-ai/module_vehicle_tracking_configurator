@@ -9,8 +9,6 @@ from PySide6.QtGui import QGuiApplication, QImage
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtCore import Qt, QSize, QSocketNotifier
 from PySide6.QtQuick import QQuickImageProvider
-from pathlib import Path
-from json import load
 import pynng
 
 from vehicle_tracking_configurator.configurator_interface_model import ModelVehicleTrackingConfigurator
