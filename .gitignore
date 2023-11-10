@@ -163,5 +163,5 @@ cython_debug/
 .vscode
 
 # Resources Folder
-./resources
-!./resources/download_resources.py
+resources
+!resources/download_resources.py
