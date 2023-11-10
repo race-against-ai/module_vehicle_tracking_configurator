@@ -1,8 +1,11 @@
 {
-  "pynng": {
-    "publishers": {
-    },
-    "subscribers": {
-    }
-  }
+	"pynng": {
+		"publishers": {},
+		"subscribers": {
+			"camera_frame_receiver": {
+                "address": "ipc:///tmp/RAAI/camera_frame.ipc",
+                "topics": {}
+            }
+		}
+	}
 }
