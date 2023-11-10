@@ -1,5 +1,6 @@
 // Copyright (C) 2023 NGITL
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
 
 import "./items"
@@ -95,6 +96,7 @@ Window {
                 function reload() {
                     id++;
                 }
+
             }
 
             MouseArea {
@@ -104,6 +106,28 @@ Window {
 
                 onClicked: {
                     console.log(pointsDrawerMouseArea.mouseX, pointsDrawerMouseArea.mouseY)
+                }
+            }
+
+            Button {
+                id: fullscreenButton
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                height: parent.height * 0.05
+                width: parent.width * 0.2
+                text: "Fullscreen"
+
+                onClicked: {
+                    if(fullscreenButton.text == "Fullscreen") {
+                        fullscreenButton.text = "Small Window"
+                        pointsDrawer.height = window.height
+                        pointsDrawer.width = window.width
+                    }
+                    else {
+                        fullscreenButton.text = "Fullscreen"
+                        pointsDrawer.height = window.videosY
+                        pointsDrawer.width = window.videosX
+                    }
                 }
             }
         }
