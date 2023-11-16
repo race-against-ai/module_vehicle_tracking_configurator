@@ -111,7 +111,7 @@ Window {
 
             Image {
                 id: fullscreenButton
-                source: "./../svg/maximize.svg"
+                source: "../svg/maximize.svg"
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 height: parent.height * 0.05
