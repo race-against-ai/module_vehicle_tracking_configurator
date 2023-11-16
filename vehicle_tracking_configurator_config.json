@@ -3,7 +3,7 @@
 		"publishers": {},
 		"subscribers": {
 			"camera_frame_receiver": {
-                "address": "ipc:///tmp/RAAI/tracker_frame.ipc",
+                "address": "ipc:///tmp/RAAI/camera_frame.ipc",
                 "topics": {}
             }
 		}
