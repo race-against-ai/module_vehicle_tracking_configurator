@@ -109,7 +109,7 @@ Window {
                 }
             }
 
-            Svg {
+            Image {
                 id: fullscreenButton
                 source: "./../svg/maximize.svg"
                 anchors.bottom: parent.bottom
