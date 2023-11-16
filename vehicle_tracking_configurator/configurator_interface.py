@@ -50,7 +50,7 @@ class ConfiguratorInterface:
 
         self.vehicle_tracking_configurator_model = ModelVehicleTrackingConfigurator()
 
-        self.frames_receiver = pynng.Sub0(dial=self.__recv_frames_address)
+        self.frames_receiver = pynng.Sub0(dial=self.__recv_frames_address, block_on_dial=False)
         self.frames_receiver.subscribe("")
 
         self.point_drawer_image_provider = StreamImageProvider(1332, 990)

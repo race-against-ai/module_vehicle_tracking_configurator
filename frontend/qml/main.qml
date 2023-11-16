@@ -109,22 +109,20 @@ Window {
                 }
             }
 
-            Button {
+            Svg {
                 id: fullscreenButton
+                source: "./../svg/maximize.svg"
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 height: parent.height * 0.05
-                width: parent.width * 0.2
-                text: "Fullscreen"
+                fillMode: Image.PreserveAspectFit
 
                 onClicked: {
-                    if(fullscreenButton.text == "Fullscreen") {
-                        fullscreenButton.text = "Small Window"
+                    if(pointsDrawer.height == window.videosY) {
                         pointsDrawer.height = window.height
                         pointsDrawer.width = window.width
                     }
                     else {
-                        fullscreenButton.text = "Fullscreen"
                         pointsDrawer.height = window.videosY
                         pointsDrawer.width = window.videosX
                     }
