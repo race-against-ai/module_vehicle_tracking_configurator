@@ -171,7 +171,7 @@ Window {
             color: window.placeholderColor
         }
 
-        Rectangle {
+        Item {
             id: optionsRectangle
 
             anchors.top: parent.top
@@ -182,74 +182,72 @@ Window {
             height: window.height - 10
             width: window.width - window.videosX - 10
 
-            color: "transparent"
-
             property int confBoxSizeY: (parent.height / 10 - 2.5) * 3
 
-            PointsConfig {
-                id: regionOfInterestPoints
+            Flickable {
+                anchors.fill: parent
+                contentWidth: optionsRectangle.width
+                contentHeight: column.height
 
-                anchors.top: parent.top
-                anchors.left: parent.left
-
-                width: parent.width
-                height: optionsRectangle.confBoxSizeY
-
-                configName: "Region of Interest"
-            }
-
-            PointsConfig {
-                id: transformationPoints
-
-                anchors.top: regionOfInterestPoints.bottom
-                anchors.topMargin: 5
-                anchors.left: parent.left
-
-                height: parent.confBoxSizeY
-                width: parent.width
-
-                configName: "Transformation Points"
-            }
-
-            CoordinateDisplay {
-                id: realWorldCoordinatePoints
-
-                anchors.top: transformationPoints.bottom
-                anchors.topMargin: 5
-
-                height: parent.confBoxSizeY
-                width: parent.width
-
-                configName: "Real World Coordinate Points"
-            }
-
-            Rectangle {
-                id: configButtonContainer
-
-                anchors.left: parent.left
-                anchors.top: realWorldCoordinatePoints.bottom
-
-                width: parent.width
-                height: parent.height / 5 / 2 + 5
-
-                color: "transparent"
-
-                ConfigButton {
-                    id: receiveConfig
-
-                    buttonText: "Receive Config"
-
-                    anchors.left: parent.left
-                    anchors.leftMargin: 25
+                ScrollBar.vertical: ScrollBar {
+                        policy: ScrollBar.AsNeeded
+                        size: 10
+                        active: flickable.contentHeight > flickable.height
                 }
 
-                ConfigButton {
-                    id: sendConfig
+                Column {
+                    id: column
+                    width: parent.width
+                    spacing: 10
 
-                    buttonText: "Transmit Config"
+                    PointsConfig {
+                        id: regionOfInterestPoints
+                        width: optionsRectangle.width
+                        height: optionsRectangle.confBoxSizeY
+                        configName: "Region of Interest"
+                    }
 
-                    anchors.right: parent.right
-                    anchors.rightMargin: 25
+                    PointsConfig {
+                        id: transformationPoints
+                        height: optionsRectangle.confBoxSizeY
+                        width: optionsRectangle.width
+                        configName: "Transformation Points"
+                    }
+
+                    CoordinateDisplay {
+                        id: realWorldCoordinatePoints
+                        height: optionsRectangle.confBoxSizeY
+                        width: optionsRectangle.width
+                        configName: "Real World Coordinate Points"
+                    }
+
+                    Rectangle {
+                        id: configButtonContainer
+                        width: optionsRectangle.width
+                        height: optionsRectangle.height / 5 / 2 + 5
+                        color: "transparent"
+
+                        ConfigButton {
+                            id: receiveConfig
+                            buttonText: "Receive Config"
+                            anchors.left: parent.left
+                            anchors.leftMargin: 25
+                        }
+
+                        ConfigButton {
+                            id: sendConfig
+                            buttonText: "Transmit Config"
+                            anchors.right: parent.right
+                            anchors.rightMargin: 25
+                        }
+                    }
+
+                    PointsConfig {
+                        id: regionOfInterestPoints2
+                        width: optionsRectangle.width
+                        height: optionsRectangle.confBoxSizeY
+                        configName: "Region of Interest"
+                    }
                 }
             }
         }
