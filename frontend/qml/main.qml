@@ -242,13 +242,6 @@ Window {
                             anchors.rightMargin: 25
                         }
                     }
-
-                    PointsConfig {
-                        id: regionOfInterestPoints2
-                        width: parent.width - vertScrollBar.width
-                        height: optionsRectangle.confBoxSizeY
-                        configName: "Region of Interest"
-                    }
                 }
             }
         }
