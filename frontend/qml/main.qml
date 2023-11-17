@@ -193,20 +193,35 @@ Window {
         }
     }
 
-    Rectangle {
-        id: optionsRectangle
+        Item {
+            id: optionsRectangle
 
         anchors.top: parent.top
         anchors.topMargin: 5
         anchors.left: pointsDrawer.right
         anchors.leftMargin: 5
 
-        height: window.height - 10
-        width: window.width - window.videosX - 10
+            height: window.height - 10
+            width: window.width - window.videosX - 10
 
-        color: "transparent"
+            property int confBoxSizeY: (parent.height / 10 - 2.5) * 3
 
-        property int confBoxSizeY: (parent.height / 10 - 2.5) * 3
+            Flickable {
+                anchors.fill: parent
+                contentWidth: optionsRectangle.width
+                contentHeight: Math.max(column.height, parent.height)
+
+                ScrollBar.vertical: ScrollBar {
+                    id: vertScrollBar
+                    policy: ScrollBar.AsNeeded
+                    size: 15
+                    interactive: true
+                }
+
+                Column {
+                    id: column
+                    width: parent.width - vertScrollBar.width
+                    spacing: 10
 
         PointsConfig {
             id: regionOfInterestPoints
@@ -368,22 +383,20 @@ Window {
 
             color: "transparent"
 
-            ConfigButton {
-                id: receiveConfig
+                    ConfigButton {
+                        id: receiveConfig
+                        buttonText: "Receive Config"
+                        anchors.left: parent.left
+                        anchors.leftMargin: 25
+                    }
 
-                buttonText: "Receive Config"
-
-                anchors.left: parent.left
-                anchors.leftMargin: 25
-            }
-
-            ConfigButton {
-                id: sendConfig
-
-                buttonText: "Transmit Config"
-
-                anchors.right: parent.right
-                anchors.rightMargin: 25
+                    ConfigButton {
+                        id: sendConfig
+                        buttonText: "Transmit Config"
+                        anchors.right: parent.right
+                        anchors.rightMargin: 25
+                        }
+                    }
             }
         }
     }
