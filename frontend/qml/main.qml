@@ -109,24 +109,49 @@ Window {
                 }
             }
 
-            Button {
-                id: fullscreenButton
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                height: parent.height * 0.05
-                width: parent.width * 0.2
-                text: "Fullscreen"
+            Item {
+                id: fullscreenButtonContainer
+                anchors.fill: parent
 
-                onClicked: {
-                    if(fullscreenButton.text == "Fullscreen") {
-                        fullscreenButton.text = "Small Window"
-                        pointsDrawer.height = window.height
-                        pointsDrawer.width = window.width
-                    }
-                    else {
-                        fullscreenButton.text = "Fullscreen"
-                        pointsDrawer.height = window.videosY
-                        pointsDrawer.width = window.videosX
+                Rectangle {
+                    id: fullscreenButtonBackground
+                    x: fullscreenButton.x
+                    y: fullscreenButton.y
+                    color: "white"
+                    opacity: 0.5
+                    visible: fullScreenButtonMouseArea.containsMouse ? true : false
+                    radius: 5
+                    height: fullscreenButton.height
+                    width: fullscreenButton.width
+                }
+
+                Svg {
+                    id: fullscreenButton
+                    source: "../svg/maximize.svg"
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    height: parent.height * 0.1
+                    fillMode: Image.PreserveAspectFit
+
+
+                    MouseArea {
+                        id: fullScreenButtonMouseArea
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onClicked: {
+                            if(pointsDrawer.height == window.videosY) {
+                                fullscreenButton.source = "../svg/minimize.svg"
+                                pointsDrawer.height = window.height
+                                pointsDrawer.width = window.width
+                            }
+                            else {
+                                fullscreenButton.source = "../svg/maximize.svg"
+                                pointsDrawer.height = window.videosY
+                                pointsDrawer.width = window.videosX
+                            }
+                        }
                     }
                 }
             }
