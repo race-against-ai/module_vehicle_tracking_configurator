@@ -187,22 +187,23 @@ Window {
             Flickable {
                 anchors.fill: parent
                 contentWidth: optionsRectangle.width
-                contentHeight: column.height
+                contentHeight: Math.max(column.height, parent.height)
 
                 ScrollBar.vertical: ScrollBar {
-                        policy: ScrollBar.AsNeeded
-                        size: 10
-                        active: flickable.contentHeight > flickable.height
+                    id: vertScrollBar
+                    policy: ScrollBar.AsNeeded
+                    size: 15
+                    interactive: true
                 }
 
                 Column {
                     id: column
-                    width: parent.width
+                    width: parent.width - vertScrollBar.width
                     spacing: 10
 
                     PointsConfig {
                         id: regionOfInterestPoints
-                        width: optionsRectangle.width
+                        width: parent.width - vertScrollBar.width
                         height: optionsRectangle.confBoxSizeY
                         configName: "Region of Interest"
                     }
@@ -210,20 +211,20 @@ Window {
                     PointsConfig {
                         id: transformationPoints
                         height: optionsRectangle.confBoxSizeY
-                        width: optionsRectangle.width
+                        width: parent.width - vertScrollBar.width
                         configName: "Transformation Points"
                     }
 
                     CoordinateDisplay {
                         id: realWorldCoordinatePoints
                         height: optionsRectangle.confBoxSizeY
-                        width: optionsRectangle.width
+                        width: parent.width - vertScrollBar.width
                         configName: "Real World Coordinate Points"
                     }
 
                     Rectangle {
                         id: configButtonContainer
-                        width: optionsRectangle.width
+                        width: parent.width - vertScrollBar.width
                         height: optionsRectangle.height / 5 / 2 + 5
                         color: "transparent"
 
@@ -244,7 +245,7 @@ Window {
 
                     PointsConfig {
                         id: regionOfInterestPoints2
-                        width: optionsRectangle.width
+                        width: parent.width - vertScrollBar.width
                         height: optionsRectangle.confBoxSizeY
                         configName: "Region of Interest"
                     }
