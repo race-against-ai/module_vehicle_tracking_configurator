@@ -99,33 +99,58 @@ Window {
 
             anchors.fill: parent
 
-            onClicked: {
-                window.onPointsShowerClicked(pointsDrawerMouseArea.mouseX, pointsDrawerMouseArea.mouseY)
-            }
-        }
-
-        Button {
-            id: pointsDrawerFullscreenButton
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            height: parent.height * 0.05
-            width: parent.width * 0.2
-            text: "Fullscreen"
-
-            onClicked: {
-                if(pointsDrawerFullscreenButton.text == "Fullscreen") {
-                    pointsDrawerFullscreenButton.text = "Small Window"
-                    pointsDrawer.height = window.height
-                    pointsDrawer.width = window.width
-                }
-                else {
-                    pointsDrawerFullscreenButton.text = "Fullscreen"
-                    pointsDrawer.height = window.videosY
-                    pointsDrawer.width = window.videosX
+                onClicked: {
+                    console.log(pointsDrawerMouseArea.mouseX, pointsDrawerMouseArea.mouseY)
                 }
             }
+
+            Item {
+                id: fullscreenButtonContainer
+                anchors.fill: parent
+
+                Rectangle {
+                    id: fullscreenButtonBackground
+                    x: fullscreenButton.x
+                    y: fullscreenButton.y
+                    color: "white"
+                    opacity: 0.5
+                    visible: fullScreenButtonMouseArea.containsMouse ? true : false
+                    radius: 5
+                    height: fullscreenButton.height
+                    width: fullscreenButton.width
+                }
+
+                Svg {
+                    id: fullscreenButton
+                    source: "../svg/maximize.svg"
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    height: parent.height * 0.1
+                    fillMode: Image.PreserveAspectFit
+
+
+                    MouseArea {
+                        id: fullScreenButtonMouseArea
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onClicked: {
+                            if(pointsDrawer.height == window.videosY) {
+                                fullscreenButton.source = "../svg/minimize.svg"
+                                pointsDrawer.height = window.height
+                                pointsDrawer.width = window.width
+                            }
+                            else {
+                                fullscreenButton.source = "../svg/maximize.svg"
+                                pointsDrawer.height = window.videosY
+                                pointsDrawer.width = window.videosX
+                            }
+                        }
+                    }
+                }
+            }
         }
-    }
 
     Rectangle {
         id: pointsShower
