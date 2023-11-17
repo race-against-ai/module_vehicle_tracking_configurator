@@ -3,16 +3,15 @@ import pynng
 import time
 import numpy as np
 
-source = cv2.VideoCapture("test_video_1.h265")
-
+source = cv2.VideoCapture("resources/test_video_1.h265")
 pub = pynng.Pub0(listen="ipc:///tmp/RAAI/camera_frame.ipc")
 
-while source.isOpened():
+while True:
     success, image = source.read()
     if not success:
-        source.release()
-    print("yes")
-    cv2.imshow("test", image)
-    cv2.waitKey(1)
+        source = cv2.VideoCapture("resources/test_video_1.h265")
+        success, image = source.read()
+        if not success:
+            raise FileNotFoundError("The video file could not be found or read.")
     pub.send(np.array(image).tobytes())
-    time.sleep(0.16666)
+    time.sleep(0.016666)

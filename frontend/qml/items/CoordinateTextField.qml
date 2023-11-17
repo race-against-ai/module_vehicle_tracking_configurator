@@ -8,13 +8,11 @@ TextField {
     width: 82
     height: 40
 
-    property string placeholderTextText
     property string assingedId
 
     anchors.topMargin: 5
     anchors.leftMargin: 5
-
-    placeholderText: placeholderTextText
+    horizontalAlignment: Text.AlignHCenter
 
     font.pixelSize: 25
     color: window.headlineColor

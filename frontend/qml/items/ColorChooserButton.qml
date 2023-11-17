@@ -1,15 +1,9 @@
 // Copyright (C) 2023 NGITL
+
 import QtQuick 2.15
 
 Rectangle {
-    id: configButton
-
-    anchors.verticalCenter: parent.verticalCenter
-    anchors.top: parent.top
-    anchors.topMargin: 5
-
-    width: parent.width / 3
-    height: parent.height / 2
+    id: colorChooserButton
 
     radius: 20
 
@@ -21,19 +15,19 @@ Rectangle {
         id: mouseHandler
 
         anchors.fill: parent
-
+        
         hoverEnabled: true
 
         onClicked: {
-            window.onConfigButtonPressed(configButton.buttonText);
+            window.onColorChooserButtonClicked(buttonText);
         }
     }
 
     Text {
         // Button Text
-        text: parent.buttonText
+        text: buttonText
         color: window.buttonTextColor
-        font.pixelSize: 30
+        font.pixelSize: 20
 
         anchors.centerIn: parent
         horizontalAlignment: Text.AlignHCenter

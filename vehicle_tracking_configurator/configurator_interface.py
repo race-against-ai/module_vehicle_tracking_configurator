@@ -5,13 +5,14 @@ from pathlib import Path
 from json import load
 import sys
 
+from PySide6.QtCore import Qt, QSize, QSocketNotifier, Slot
 from PySide6.QtGui import QGuiApplication, QImage
 from PySide6.QtQml import QQmlApplicationEngine
-from PySide6.QtCore import Qt, QSize, QSocketNotifier
 from PySide6.QtQuick import QQuickImageProvider
 import pynng
 
 from vehicle_tracking_configurator.configurator_interface_model import ModelVehicleTrackingConfigurator
+from vehicle_tracking_configurator.configurator import ConfiguratorHandler
 
 
 def find_base_directory() -> Path:
@@ -25,12 +26,12 @@ def find_base_directory() -> Path:
 
 class StreamImageProvider(QQuickImageProvider):
     def __init__(self, width: int, height: int) -> None:
-        super(StreamImageProvider, self).__init__(QQuickImageProvider.Image)  # type: ignore
-        self.img = QImage(width, height, QImage.Format_RGB888)  # type: ignore
+        super(StreamImageProvider, self).__init__(QQuickImageProvider.Image)  # type: ignore[attr-defined]
+        self.img = QImage(width, height, QImage.Format_RGB888)  # type: ignore[attr-defined]
 
     def requestImage(self, id: str, size: QSize, requested_size: QSize) -> QImage:
         if requested_size.width() > 0 and requested_size.height() > 0:
-            return self.img.scaled(requested_size, Qt.KeepAspectRatio)  # type: ignore
+            return self.img.scaled(requested_size, Qt.KeepAspectRatio)  # type: ignore[attr-defined]
         else:
             return self.img
 
@@ -47,32 +48,44 @@ class ConfiguratorInterface:
 
         self.__app = QGuiApplication()
         self.__engine = QQmlApplicationEngine()
+        self.__configuration_handler = ConfiguratorHandler()
 
-        self.vehicle_tracking_configurator_model = ModelVehicleTrackingConfigurator()
+        self.__vehicle_tracking_configurator_model = ModelVehicleTrackingConfigurator()
 
-        self.frames_receiver = pynng.Sub0(dial=self.__recv_frames_address, block_on_dial=False)
-        self.frames_receiver.subscribe("")
+        self.__frames_receiver = pynng.Sub0(dial=self.__recv_frames_address, block_on_dial=False)
+        self.__frames_receiver.subscribe("")
 
-        self.point_drawer_image_provider = StreamImageProvider(1332, 990)
+        self.__point_drawer_image_provider = StreamImageProvider(1332, 990)
+        self.__point_shower_image_provider = StreamImageProvider(1332, 990)
 
-        self.__engine.addImageProvider("point_drawer", self.point_drawer_image_provider)
+        self.__engine.addImageProvider("point_drawer", self.__point_drawer_image_provider)
+        self.__engine.addImageProvider("point_shower", self.__point_shower_image_provider)
 
         self.__engine.rootContext().setContextProperty("configurator_interface", self)
         self.__engine.rootContext().setContextProperty(
-            "vehicle_tracking_configurator_model", self.vehicle_tracking_configurator_model
+            "vehicle_tracking_configurator_model", self.__vehicle_tracking_configurator_model
         )
 
         self.__engine.load(str(base_dir / "frontend/qml/main.qml"))
 
-        self.__point_drawer_socket_notifier = QSocketNotifier(self.frames_receiver.recv_fd, QSocketNotifier.Read)  # type: ignore
-        self.__point_drawer_socket_notifier.activated.connect(self.image_receiver_callback)
+        self.__send_next_frame_notifier = QSocketNotifier(self.__frames_receiver.recv_fd, QSocketNotifier.Read)  # type: ignore[attr-defined]
+        self.__send_next_frame_notifier.activated.connect(self.send_next_images)
 
         self.image_count = 0
 
-    def image_receiver_callback(self) -> None:
-        data = self.frames_receiver.recv()
-        self.point_drawer_image_provider.img = QImage(data, 1332, 990, QImage.Format_BGR888)  # type: ignore
-        self.vehicle_tracking_configurator_model.reloadImage.emit()
+    def send_next_images(self) -> None:
+        """Callback for the image receiver."""
+        drawer_frame = self.__configuration_handler.read_drawer_frame()
+        shower_frame = self.__configuration_handler.read_shower_frame()
+
+        self.__point_drawer_image_provider.img = QImage(drawer_frame, 1332, 990, QImage.Format_BGR888)  # type: ignore[attr-defined]
+        self.__point_shower_image_provider.img = QImage(shower_frame, 1332, 990, QImage.Format_BGR888)  # type: ignore[attr-defined]
+
+        self.__vehicle_tracking_configurator_model.reload_image.emit()
+
+    @Slot(str)
+    def on_text_changed(self, new_text):
+        print(f"Text changed: {new_text}")
 
     def run(self) -> None:
         """Run the QT application."""
