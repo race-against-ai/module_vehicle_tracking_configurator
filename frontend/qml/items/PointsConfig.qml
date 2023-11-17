@@ -47,7 +47,7 @@ Rectangle {
         id: imagePointXInput
 
         assingedId: "imagePointXInput"
-        placeholderTextText: "X"
+        placeholderText: "X"
 
         anchors.top: imageCoordsText.bottom
         anchors.left: parent.left
@@ -57,7 +57,7 @@ Rectangle {
         id: imagePointYInput
 
         assingedId: "imagePointYInput"
-        placeholderTextText: "Y"
+        placeholderText: "Y"
 
         anchors.top: imageCoordsText.bottom
         anchors.left: imagePointXInput.right
@@ -83,7 +83,7 @@ Rectangle {
         id: realPointXInput
 
         assingedId: "realPointXInput"
-        placeholderTextText: "X"
+        placeholderText: "X"
 
         anchors.top: realCoordsText.bottom
         anchors.left: pointsConfig.left
@@ -93,7 +93,7 @@ Rectangle {
         id: realPointYInput
 
         assingedId: "realPointYInput"
-        placeholderTextText: "Y"
+        placeholderText: "Y"
 
         anchors.top: realCoordsText.bottom
         anchors.left: realPointXInput.right
