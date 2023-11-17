@@ -119,7 +119,7 @@ Window {
                     y: fullscreenButton.y
                     color: "white"
                     opacity: 0.5
-                    visible: false
+                    visible: fullScreenButtonMouseArea.containsMouse ? true : false
                     radius: 5
                     height: fullscreenButton.height
                     width: fullscreenButton.width
@@ -135,6 +135,8 @@ Window {
 
 
                     MouseArea {
+                        id: fullScreenButtonMouseArea
+
                         anchors.fill: parent
                         hoverEnabled: true
 
@@ -150,19 +152,9 @@ Window {
                                 pointsDrawer.width = window.videosX
                             }
                         }
-
-                        onEntered: {
-                            fullscreenButtonBackground.visible = true
-                        }
-
-                        onExited: {
-                            fullscreenButtonBackground.visible = false
-                        }
                     }
                 }
             }
-
-
         }
 
         Rectangle {
