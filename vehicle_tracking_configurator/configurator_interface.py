@@ -1,6 +1,7 @@
 """Starting the QT application."""
 # Copyright (C) 2023, NG:ITL
 
+from threading import Thread, Event
 from pathlib import Path
 from json import load
 import sys
@@ -68,20 +69,22 @@ class ConfiguratorInterface:
 
         self.__engine.load(str(base_dir / "frontend/qml/main.qml"))
 
-        self.__send_next_frame_notifier = QSocketNotifier(self.__frames_receiver.recv_fd, QSocketNotifier.Read)  # type: ignore[attr-defined]
-        self.__send_next_frame_notifier.activated.connect(self.send_next_images)
-
         self.image_count = 0
 
-    def send_next_images(self) -> None:
+        self.__stop_thread_event = Event()
+        self.__send_next_images_thread = Thread(target=self.__send_next_images_worker)
+        self.__send_next_images_thread.start()
+
+    def __send_next_images_worker(self) -> None:
         """Callback for the image receiver."""
-        drawer_frame = self.__configuration_handler.read_drawer_frame()
-        shower_frame = self.__configuration_handler.read_shower_frame()
+        while not self.__stop_thread_event.is_set():
+            drawer_frame = self.__configuration_handler.read_drawer_frame()
+            shower_frame = self.__configuration_handler.read_shower_frame()
 
-        self.__point_drawer_image_provider.img = QImage(drawer_frame, 1332, 990, QImage.Format_BGR888)  # type: ignore[attr-defined]
-        self.__point_shower_image_provider.img = QImage(shower_frame, 1332, 990, QImage.Format_BGR888)  # type: ignore[attr-defined]
+            self.__point_drawer_image_provider.img = QImage(drawer_frame, 1332, 990, QImage.Format_BGR888)  # type: ignore[attr-defined]
+            self.__point_shower_image_provider.img = QImage(shower_frame, 1332, 990, QImage.Format_BGR888)  # type: ignore[attr-defined]
 
-        self.__vehicle_tracking_configurator_model.reload_image.emit()
+            self.__vehicle_tracking_configurator_model.reload_image.emit()
 
     @Slot(str)
     def on_text_changed(self, new_text):
@@ -90,3 +93,5 @@ class ConfiguratorInterface:
     def run(self) -> None:
         """Run the QT application."""
         self.__app.exec_()
+        self.__stop_thread_event.set()
+        self.__send_next_images_thread.join()
