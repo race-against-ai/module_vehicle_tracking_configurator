@@ -6,7 +6,7 @@ from pathlib import Path
 from json import load
 import sys
 
-from PySide6.QtCore import Qt, QSize, QSocketNotifier, Slot
+from PySide6.QtCore import Qt, QSize, Slot
 from PySide6.QtGui import QGuiApplication, QImage
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickImageProvider
@@ -76,7 +76,7 @@ class ConfiguratorInterface:
         self.__send_next_images_thread.start()
 
     def __send_next_images_worker(self) -> None:
-        """Callback for the image receiver."""
+        """A function that constantly sends new images to the UI."""
         while not self.__stop_thread_event.is_set():
             drawer_frame = self.__configuration_handler.read_drawer_frame()
             shower_frame = self.__configuration_handler.read_shower_frame()
