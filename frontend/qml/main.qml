@@ -91,7 +91,6 @@ Window {
             function reload() {
                 id++;
             }
-
         }
 
         MouseArea {
@@ -99,58 +98,58 @@ Window {
 
             anchors.fill: parent
 
-                onClicked: {
-                    console.log(pointsDrawerMouseArea.mouseX, pointsDrawerMouseArea.mouseY)
-                }
+            onClicked: {
+                console.log(pointsDrawerMouseArea.mouseX, pointsDrawerMouseArea.mouseY)
+            }
+        }
+
+        Item {
+            id: fullscreenButtonContainer
+            anchors.fill: parent
+
+            Rectangle {
+                id: fullscreenButtonBackground
+                x: fullscreenButton.x
+                y: fullscreenButton.y
+                color: "white"
+                opacity: 0.5
+                visible: fullScreenButtonMouseArea.containsMouse ? true : false
+                radius: 5
+                height: fullscreenButton.height
+                width: fullscreenButton.width
             }
 
-            Item {
-                id: fullscreenButtonContainer
-                anchors.fill: parent
-
-                Rectangle {
-                    id: fullscreenButtonBackground
-                    x: fullscreenButton.x
-                    y: fullscreenButton.y
-                    color: "white"
-                    opacity: 0.5
-                    visible: fullScreenButtonMouseArea.containsMouse ? true : false
-                    radius: 5
-                    height: fullscreenButton.height
-                    width: fullscreenButton.width
-                }
-
-                Svg {
-                    id: fullscreenButton
-                    source: "../svg/maximize.svg"
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    height: parent.height * 0.1
-                    fillMode: Image.PreserveAspectFit
+            Svg {
+                id: fullscreenButton
+                source: "../svg/maximize.svg"
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                height: parent.height * 0.1
+                fillMode: Image.PreserveAspectFit
 
 
-                    MouseArea {
-                        id: fullScreenButtonMouseArea
+                MouseArea {
+                    id: fullScreenButtonMouseArea
 
-                        anchors.fill: parent
-                        hoverEnabled: true
+                    anchors.fill: parent
+                    hoverEnabled: true
 
-                        onClicked: {
-                            if(pointsDrawer.height == window.videosY) {
-                                fullscreenButton.source = "../svg/minimize.svg"
-                                pointsDrawer.height = window.height
-                                pointsDrawer.width = window.width
-                            }
-                            else {
-                                fullscreenButton.source = "../svg/maximize.svg"
-                                pointsDrawer.height = window.videosY
-                                pointsDrawer.width = window.videosX
-                            }
+                    onClicked: {
+                        if(pointsDrawer.height == window.videosY) {
+                            fullscreenButton.source = "../svg/minimize.svg"
+                            pointsDrawer.height = window.height
+                            pointsDrawer.width = window.width
+                        }
+                        else {
+                            fullscreenButton.source = "../svg/maximize.svg"
+                            pointsDrawer.height = window.videosY
+                            pointsDrawer.width = window.videosX
                         }
                     }
                 }
             }
         }
+    }
 
     Rectangle {
         id: pointsShower
@@ -193,195 +192,203 @@ Window {
         }
     }
 
-        Item {
-            id: optionsRectangle
+    Item {
+        id: optionsRectangle
 
         anchors.top: parent.top
         anchors.topMargin: 5
         anchors.left: pointsDrawer.right
         anchors.leftMargin: 5
 
-            height: window.height - 10
-            width: window.width - window.videosX - 10
+        height: window.height - 10
+        width: window.width - window.videosX - 10
 
-            property int confBoxSizeY: (parent.height / 10 - 2.5) * 3
+        property int confBoxSizeY: (parent.height / 10 - 2.5) * 3
 
-            Flickable {
-                anchors.fill: parent
-                contentWidth: optionsRectangle.width
-                contentHeight: Math.max(column.height, parent.height)
+        Flickable {
+            anchors.fill: parent
+            contentWidth: optionsRectangle.width
+            contentHeight: Math.max(column.height, parent.height)
 
-                ScrollBar.vertical: ScrollBar {
-                    id: vertScrollBar
-                    policy: ScrollBar.AsNeeded
-                    size: 15
-                    interactive: true
+            ScrollBar.vertical: ScrollBar {
+                id: vertScrollBar
+                policy: ScrollBar.AsNeeded
+                size: 15
+                interactive: true
+            }
+
+            Column {
+                id: column
+                width: parent.width - vertScrollBar.width
+                spacing: 10
+
+                PointsConfig {
+                    id: regionOfInterestPoints
+
+                    // anchors.top: parent.top
+                    // anchors.left: parent.left
+
+                    width: parent.width
+                    height: optionsRectangle.confBoxSizeY
+
+                    configName: "Region of Interest"
                 }
 
-                Column {
-                    id: column
-                    width: parent.width - vertScrollBar.width
-                    spacing: 10
+                PointsConfig {
+                    id: transformationPoints
 
-        PointsConfig {
-            id: regionOfInterestPoints
+                    // anchors.top: regionOfInterestPoints.bottom
+                    // anchors.topMargin: 5
+                    // anchors.left: parent.left
 
-            anchors.top: parent.top
-            anchors.left: parent.left
+                    height: optionsRectangle.confBoxSizeY
+                    width: parent.width
 
-            width: parent.width
-            height: optionsRectangle.confBoxSizeY
+                    configName: "Transformation Points"
+                }
 
-            configName: "Region of Interest"
-        }
+                Item {
+                    // Container for Real World Coordinates and Color Picker Buttons
 
-        PointsConfig {
-            id: transformationPoints
+                    height: optionsRectangle.confBoxSizeY
+                    width: parent.width
 
-            anchors.top: regionOfInterestPoints.bottom
-            anchors.topMargin: 5
-            anchors.left: parent.left
+                    CoordinateDisplay {
+                        id: realWorldCoordinatePoints
 
-            height: parent.confBoxSizeY
-            width: parent.width
+                        anchors.top: parent.top
+                        // anchors.topMargin: 5
 
-            configName: "Transformation Points"
-        }
+                        height: parent.height
+                        width: parent.width / 10 * 6
 
-        CoordinateDisplay {
-            id: realWorldCoordinatePoints
+                        configName: "Real World Coordinate Points"
+                    }
 
-            anchors.top: transformationPoints.bottom
-            anchors.topMargin: 5
+                    Rectangle {
+                        // Color picker buttons
 
-            height: parent.confBoxSizeY
-            width: parent.width / 10 * 6
+                        anchors.left: realWorldCoordinatePoints.right
+                        anchors.leftMargin: 5
+                        anchors.top: parent.top
+                        // anchors.topMargin: 5
 
-            configName: "Real World Coordinate Points"
-        }
+                        width: parent.width / 10 * 4
+                        height: optionsRectangle.confBoxSizeY
 
-        Rectangle {
-            // Color picker buttons
+                        color: window.accentColor
 
-            anchors.left: realWorldCoordinatePoints.right
-            anchors.leftMargin: 5
-            anchors.top: transformationPoints.bottom
-            anchors.topMargin: 5
+                        ColorTextField {
+                            id: redColorTextField
 
-            width: parent.width / 10 * 4
-            height: parent.confBoxSizeY
+                            placeholderText: "0-255"
+                            assingedColor: "red"
 
-            color: window.accentColor
+                            anchors.top: parent.top
+                            anchors.topMargin: 5
+                            anchors.left: parent.left
+                            anchors.leftMargin: 5
 
-            ColorTextField {
-                id: redColorTextField
+                            width: parent.width / 4 - 10
+                        }
 
-                placeholderText: "0-255"
-                assingedColor: "red"
+                        ColorTextField {
+                            id: greenColorTextField
 
-                anchors.top: parent.top
-                anchors.topMargin: 5
-                anchors.left: parent.left
-                anchors.leftMargin: 5
+                            placeholderText: "0-255"
+                            assingedColor: "green"
 
-                width: parent.width / 4 - 10
-            }
+                            anchors.top: parent.top
+                            anchors.topMargin: 5
+                            anchors.left: redColorTextField.right
+                            anchors.leftMargin: 5
 
-            ColorTextField {
-                id: greenColorTextField
+                            width: parent.width / 4 - 10
+                        }
 
-                placeholderText: "0-255"
-                assingedColor: "green"
+                        ColorTextField {
+                            id: blueColorTextField
 
-                anchors.top: parent.top
-                anchors.topMargin: 5
-                anchors.left: redColorTextField.right
-                anchors.leftMargin: 5
+                            placeholderText: "0-255"
+                            assingedColor: "blue"
 
-                width: parent.width / 4 - 10
-            }
+                            anchors.top: parent.top
+                            anchors.topMargin: 5
+                            anchors.left: greenColorTextField.right
+                            anchors.leftMargin: 5
 
-            ColorTextField {
-                id: blueColorTextField
+                            width: parent.width / 4 - 10
+                        }
 
-                placeholderText: "0-255"
-                assingedColor: "blue"
+                        ColorTextField {
+                            id: alphaColorTextField
 
-                anchors.top: parent.top
-                anchors.topMargin: 5
-                anchors.left: greenColorTextField.right
-                anchors.leftMargin: 5
+                            placeholderText: "0-255"
+                            assingedColor: "alpha"
 
-                width: parent.width / 4 - 10
-            }
+                            anchors.top: parent.top
+                            anchors.topMargin: 5
+                            anchors.left: blueColorTextField.right
+                            anchors.leftMargin: 5
 
-            ColorTextField {
-                id: alphaColorTextField
+                            width: parent.width / 4 - 10
+                        }
 
-                placeholderText: "0-255"
-                assingedColor: "alpha"
+                        ColorChooserButton {
+                            id: grayColorChooserButton
 
-                anchors.top: parent.top
-                anchors.topMargin: 5
-                anchors.left: blueColorTextField.right
-                anchors.leftMargin: 5
+                            anchors.top: redColorTextField.bottom
+                            anchors.topMargin: 5
+                            anchors.left: parent.left
+                            anchors.leftMargin: 5
 
-                width: parent.width / 4 - 10
-            }
+                            width: parent.width / 3 - 10
+                            height: 40
 
-            ColorChooserButton {
-                id: grayColorChooserButton
+                            buttonText: "Gray"
+                        }
 
-                anchors.top: redColorTextField.bottom
-                anchors.topMargin: 5
-                anchors.left: parent.left
-                anchors.leftMargin: 5
+                        ColorChooserButton {
+                            id: blackColorChooserButton
 
-                width: parent.width / 3 - 10
-                height: 40
+                            anchors.top: redColorTextField.bottom
+                            anchors.topMargin: 5
+                            anchors.left: grayColorChooserButton.right
+                            anchors.leftMargin: 5
 
-                buttonText: "Gray"
-            }
+                            width: parent.width / 3 - 10
+                            height: 40
 
-            ColorChooserButton {
-                id: blackColorChooserButton
+                            buttonText: "Black"
+                        }
 
-                anchors.top: redColorTextField.bottom
-                anchors.topMargin: 5
-                anchors.left: grayColorChooserButton.right
-                anchors.leftMargin: 5
+                        ColorChooserButton {
+                            id: whiteColorChooserButton
 
-                width: parent.width / 3 - 10
-                height: 40
+                            anchors.top: redColorTextField.bottom
+                            anchors.topMargin: 5
+                            anchors.left: blackColorChooserButton.right
+                            anchors.leftMargin: 5
 
-                buttonText: "Black"
-            }
+                            width: parent.width / 3 - 10
+                            height: 40
 
-            ColorChooserButton {
-                id: whiteColorChooserButton
+                            buttonText: "White"
+                        }
+                    }
+                }
 
-                anchors.top: redColorTextField.bottom
-                anchors.topMargin: 5
-                anchors.left: blackColorChooserButton.right
-                anchors.leftMargin: 5
 
-                width: parent.width / 3 - 10
-                height: 40
+                Rectangle {
+                    id: configButtonContainer
 
-                buttonText: "White"
-            }
-        }
+                    // anchors.left: parent.left
+                    // anchors.top: realWorldCoordinatePoints.bottom
 
-        Rectangle {
-            id: configButtonContainer
+                    width: parent.width
+                    height: parent.height / 5 / 2 + 5
 
-            anchors.left: parent.left
-            anchors.top: realWorldCoordinatePoints.bottom
-
-            width: parent.width
-            height: parent.height / 5 / 2 + 5
-
-            color: "transparent"
+                    color: "transparent"
 
                     ConfigButton {
                         id: receiveConfig
@@ -395,8 +402,8 @@ Window {
                         buttonText: "Transmit Config"
                         anchors.right: parent.right
                         anchors.rightMargin: 25
-                        }
                     }
+                }
             }
         }
     }
