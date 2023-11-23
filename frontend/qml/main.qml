@@ -232,6 +232,14 @@ Window {
                     height: optionsRectangle.confBoxSizeY
 
                     configName: "Region of Interest"
+
+                    Rectangle {
+                        id: regionOfInterestPointsCover
+                        visible: true
+                        anchors.fill: parent
+                        color: "black"
+                        opacity: 0.5
+                    }
                 }
 
                 PointsConfig {
@@ -245,6 +253,14 @@ Window {
                     width: parent.width
 
                     configName: "Transformation Points"
+
+                    Rectangle {
+                        id: transformationPointsCover
+                        visible: true
+                        anchors.fill: parent
+                        color: "black"
+                        opacity: 0.5
+                    }
                 }
 
                 Item {
@@ -376,6 +392,14 @@ Window {
                             buttonText: "White"
                         }
                     }
+
+                    Rectangle {
+                        id: worldCordCover
+                        visible: true
+                        anchors.fill: parent
+                        color: "black"
+                        opacity: 0.5
+                    }
                 }
 
 
@@ -405,11 +429,10 @@ Window {
                     }
                 }
 
-                Rectangle {
-                    id: test
+                CheckboxContainer {
+                    id: checkboxContainer
                     width: parent.width
                     height: parent.height / 10
-                    color: "white"
                 }
             }
         }
