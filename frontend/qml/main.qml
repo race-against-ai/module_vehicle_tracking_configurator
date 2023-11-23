@@ -404,6 +404,13 @@ Window {
                         anchors.rightMargin: 25
                     }
                 }
+
+                Rectangle {
+                    id: test
+                    width: parent.width
+                    height: parent.height / 10
+                    color: "white"
+                }
             }
         }
     }
