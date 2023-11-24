@@ -62,6 +62,9 @@ Window {
     function onPointsDrawerClicked(x, y) {
         vehicle_tracking_configurator_model.points_drawer_clicked(x, y);
     }
+    function onStatesUpdated(roi_state, t_point_state, world_state) {
+        vehicle_tracking_configurator_model.updated_mode(roi_state, t_point_state, world_state);
+    }
 
     Rectangle {
         id: pointsDrawer
@@ -221,6 +224,12 @@ Window {
                 id: column
                 width: parent.width - vertScrollBar.width
                 spacing: 10
+
+                CheckboxContainer {
+                    id: checkboxContainer
+                    width: parent.width
+                    height: parent.height / 10
+                }
 
                 PointsConfig {
                     id: regionOfInterestPoints
@@ -427,12 +436,6 @@ Window {
                         anchors.right: parent.right
                         anchors.rightMargin: 25
                     }
-                }
-
-                CheckboxContainer {
-                    id: checkboxContainer
-                    width: parent.width
-                    height: parent.height / 10
                 }
             }
         }
