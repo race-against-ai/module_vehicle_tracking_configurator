@@ -33,19 +33,17 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        parent.parent.checked = !parent.parent.checked
+                        regionOfInterestCheckbox.checked = true
+                        worldCordCheckbox.checked = false
+                        transformationPointsCheckbox.checked = false
+
                         window.onStatesUpdated(regionOfInterestCheckbox.checked, transformationPointsCheckbox.checked, worldCordCheckbox.checked)
+
+                        regionOfInterestPointsCover.visible = !regionOfInterestCheckbox.checked
+                        worldCordCover.visible = !worldCordCheckbox.checked
+                        transformationPointsCover.visible = !transformationPointsCheckbox.checked
                     }
                 }
-            }
-
-            onCheckedChanged: {
-                console.log("Real Word Cord checkbox triggered")
-                regionOfInterestPointsCover.visible = !checked
-                worldCordCover.visible = !worldCordCheckbox.checked
-                transformationPointsCover.visible = !transformationPointsCheckbox.checked
-                worldCordCheckbox.checked = false
-                transformationPointsCheckbox.checked = false
             }
         }
 
@@ -73,19 +71,17 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        parent.parent.checked = !parent.parent.checked
+                        transformationPointsCheckbox.checked = true
+                        regionOfInterestCheckbox.checked = false
+                        worldCordCheckbox.checked = false
+
                         window.onStatesUpdated(regionOfInterestCheckbox.checked, transformationPointsCheckbox.checked, worldCordCheckbox.checked)
+
+                        worldCordCover.visible = !worldCordCheckbox.checked
+                        regionOfInterestPointsCover.visible = !regionOfInterestCheckbox.checked
+                        transformationPointsCover.visible = !transformationPointsCheckbox.checked
                     }
                 }
-            }
-
-            onCheckedChanged: {
-                console.log("Transformation Point checkbox triggered")
-                worldCordCover.visible = !worldCordCheckbox.checked
-                regionOfInterestPointsCover.visible = !regionOfInterestCheckbox.checked
-                transformationPointsCover.visible = !transformationPointsCheckbox.checked
-                regionOfInterestCheckbox.checked = false
-                worldCordCheckbox.checked = false
             }
         }
 
@@ -113,19 +109,17 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        parent.parent.checked = !parent.parent.checked
+                        worldCordCheckbox.checked = true
+                        regionOfInterestCheckbox.checked = false
+                        transformationPointsCheckbox.checked = false
+
                         window.onStatesUpdated(regionOfInterestCheckbox.checked, transformationPointsCheckbox.checked, worldCordCheckbox.checked)
+
+                        worldCordCover.visible = !worldCordCheckbox.checked
+                        regionOfInterestPointsCover.visible = !regionOfInterestCheckbox.checked
+                        transformationPointsCover.visible = !transformationPointsCheckbox.checked
                     }
                 }
-            }
-
-            onCheckedChanged: {
-                console.log("Real Word Cord checkbox triggered")
-                worldCordCover.visible = !checked
-                regionOfInterestPointsCover.visible = !regionOfInterestCheckbox.checked
-                transformationPointsCover.visible = !transformationPointsCheckbox.checked
-                regionOfInterestCheckbox.checked = false
-                transformationPointsCheckbox.checked = false
             }
         }
     }
