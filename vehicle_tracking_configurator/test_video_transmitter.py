@@ -8,6 +8,7 @@ import sys
 import pynng
 import cv2
 
+
 def find_base_directory() -> Path:
     """Find the base directory of the project."""
     search_paths = {Path().cwd(), Path().cwd().parent, Path(__file__).parent.parent}
@@ -15,6 +16,7 @@ def find_base_directory() -> Path:
         if (directory / "vehicle_tracking_configurator_config.json").exists():
             return directory
     sys.exit(1)
+
 
 base_dir = find_base_directory()
 
