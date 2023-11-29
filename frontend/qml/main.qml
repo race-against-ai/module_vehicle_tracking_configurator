@@ -14,7 +14,6 @@ Window {
 
     property color backgroundColor: "#0f0e17"
     property color headlineColor: "#fffffe"
-    property color paragraphColor: "#a7a9be"
     property color buttonColor: "#ff8906"
     property color hoverButtonColor: "#ffad52"
     property color buttonTextColor: "#fffffe"
@@ -37,31 +36,6 @@ Window {
     visible: true
 
     title: "Configurator Interface"
-
-    function onConfigButtonPressed(button_text) {
-        vehicle_tracking_configurator_model.config_button_pressed(button_text);
-    }
-    function onCoordinateTextChanged(input_id, config_name, text) {
-        vehicle_tracking_configurator_model.coordinate_text_changed(input_id, config_name, text);
-    }
-    function onColorTextChanged(input_id, text) {
-        vehicle_tracking_configurator_model.color_text_changed(input_id, text);
-    }
-    function onDeleteButtonClicked(config_name) {
-        vehicle_tracking_configurator_model.delete_button_clicked(config_name);
-    }
-    function onArrowButtonClicked(config_name, direction) {
-        vehicle_tracking_configurator_model.arrow_button_clicked(config_name, direction);
-    }
-    function onColorChooserButtonClicked(buttonColor) {
-        vehicle_tracking_configurator_model.color_chooser_button_clicked(buttonColor);
-    }
-    function onPointsShowerClicked(x, y) {
-        vehicle_tracking_configurator_model.points_shower_clicked(x, y);
-    }
-    function onPointsDrawerClicked(x, y) {
-        vehicle_tracking_configurator_model.points_drawer_clicked(x, y);
-    }
 
     Rectangle {
         id: pointsDrawer
@@ -99,7 +73,7 @@ Window {
             anchors.fill: parent
 
             onClicked: {
-                console.log(pointsDrawerMouseArea.mouseX, pointsDrawerMouseArea.mouseY)
+                vehicle_tracking_configurator_model.points_drawer_clicked(pointsDrawerMouseArea.mouseX, pointsDrawerMouseArea.mouseY, pointsDrawerStream.width, pointsDrawerStream.height);
             }
         }
 
@@ -187,7 +161,7 @@ Window {
             anchors.fill: parent
 
             onClicked: {
-                window.onPointsDrawerClicked(pointsShowerMouseArea.mouseX, pointsShowerMouseArea.mouseY)
+                vehicle_tracking_configurator_model.points_shower_clicked(pointsShowerMouseArea.mouseX, pointsShowerMouseArea.mouseY, pointsShowerStream.width, pointsShowerStream.height);
             }
         }
     }
@@ -220,31 +194,26 @@ Window {
             Column {
                 id: column
                 width: parent.width - vertScrollBar.width
-                spacing: 10
+                spacing: 5
 
                 PointsConfig {
                     id: regionOfInterestPoints
-
-                    // anchors.top: parent.top
-                    // anchors.left: parent.left
 
                     width: parent.width
                     height: optionsRectangle.confBoxSizeY
 
                     configName: "Region of Interest"
+                    chosenPointDefaultText: "new"
                 }
 
                 PointsConfig {
                     id: transformationPoints
 
-                    // anchors.top: regionOfInterestPoints.bottom
-                    // anchors.topMargin: 5
-                    // anchors.left: parent.left
-
                     height: optionsRectangle.confBoxSizeY
                     width: parent.width
 
                     configName: "Transformation Points"
+                    chosenPointDefaultText: "top_left"
                 }
 
                 Item {
@@ -257,7 +226,6 @@ Window {
                         id: realWorldCoordinatePoints
 
                         anchors.top: parent.top
-                        // anchors.topMargin: 5
 
                         height: parent.height
                         width: parent.width / 10 * 6
@@ -271,7 +239,6 @@ Window {
                         anchors.left: realWorldCoordinatePoints.right
                         anchors.leftMargin: 5
                         anchors.top: parent.top
-                        // anchors.topMargin: 5
 
                         width: parent.width / 10 * 4
                         height: optionsRectangle.confBoxSizeY
@@ -283,6 +250,7 @@ Window {
 
                             placeholderText: "0-255"
                             assingedColor: "red"
+                            text: "0"
 
                             anchors.top: parent.top
                             anchors.topMargin: 5
@@ -297,6 +265,7 @@ Window {
 
                             placeholderText: "0-255"
                             assingedColor: "green"
+                            text: "0"
 
                             anchors.top: parent.top
                             anchors.topMargin: 5
@@ -311,6 +280,7 @@ Window {
 
                             placeholderText: "0-255"
                             assingedColor: "blue"
+                            text: "0"
 
                             anchors.top: parent.top
                             anchors.topMargin: 5
@@ -325,6 +295,7 @@ Window {
 
                             placeholderText: "0-255"
                             assingedColor: "alpha"
+                            text: "255"
 
                             anchors.top: parent.top
                             anchors.topMargin: 5
@@ -338,7 +309,7 @@ Window {
                             id: grayColorChooserButton
 
                             anchors.top: redColorTextField.bottom
-                            anchors.topMargin: 5
+                            anchors.topMargin: 10
                             anchors.left: parent.left
                             anchors.leftMargin: 5
 
@@ -352,7 +323,7 @@ Window {
                             id: blackColorChooserButton
 
                             anchors.top: redColorTextField.bottom
-                            anchors.topMargin: 5
+                            anchors.topMargin: 10
                             anchors.left: grayColorChooserButton.right
                             anchors.leftMargin: 5
 
@@ -366,7 +337,7 @@ Window {
                             id: whiteColorChooserButton
 
                             anchors.top: redColorTextField.bottom
-                            anchors.topMargin: 5
+                            anchors.topMargin: 10
                             anchors.left: blackColorChooserButton.right
                             anchors.leftMargin: 5
 
@@ -381,9 +352,6 @@ Window {
 
                 Rectangle {
                     id: configButtonContainer
-
-                    // anchors.left: parent.left
-                    // anchors.top: realWorldCoordinatePoints.bottom
 
                     width: parent.width
                     height: parent.height / 5 / 2 + 5
@@ -414,6 +382,33 @@ Window {
         function onReloadImage() {
             pointsDrawerStream.reload()
             pointsShowerStream.reload()
+        }
+
+        function onColorTextChanged(texts) {
+            redColorTextField.text = texts[0];
+            greenColorTextField.text = texts[1];
+            blueColorTextField.text = texts[2];
+            alphaColorTextField.text = texts[3];
+        }
+
+        function onRegionOfInterestPointsChanged(points) {
+            regionOfInterestPoints.setPoints(points);
+        }
+
+        function onTransformationPointsChanged(points) {
+            transformationPoints.setPoints(points);
+        }
+
+        function onRealWorldPointsChanged(points) {
+            realWorldCoordinatePoints.setPoints(points);
+        }
+
+        function onRegionOfInterestPointChosen(point) {
+            regionOfInterestPoints.setChosenPoint(point);
+        }
+
+        function onTransformationPointChosen(point) {
+            transformationPoints.setChosenPoint(point);
         }
     }
 }
