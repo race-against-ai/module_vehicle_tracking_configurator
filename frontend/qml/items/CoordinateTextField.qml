@@ -17,8 +17,11 @@ TextField {
     font.pixelSize: 25
     color: window.headlineColor
 
+    // FIXME: Fix this so it limits it to 1332 and not 9999 (could be bug in Qt)
+    validator: IntValidator { bottom: 0; top: 1332 }
+
     onTextEdited: {
-        window.onCoordinateTextChanged(assingedId, pointsConfig.configName, coordInput.text);
+        vehicle_tracking_configurator_model.coordinate_text_changed(assingedId, pointsConfig.configName, text);
     }
 
     background: Rectangle {

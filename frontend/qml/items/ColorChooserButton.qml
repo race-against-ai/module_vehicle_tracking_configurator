@@ -19,7 +19,7 @@ Rectangle {
         hoverEnabled: true
 
         onClicked: {
-            window.onColorChooserButtonClicked(buttonText);
+            vehicle_tracking_configurator_model.color_chooser_button_clicked(buttonText);
         }
     }
 

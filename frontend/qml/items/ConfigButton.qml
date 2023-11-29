@@ -25,7 +25,7 @@ Rectangle {
         hoverEnabled: true
 
         onClicked: {
-            window.onConfigButtonPressed(configButton.buttonText);
+            vehicle_tracking_configurator_model.config_button_pressed(configButton.buttonText);
         }
     }
 
