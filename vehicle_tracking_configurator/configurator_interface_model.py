@@ -37,7 +37,7 @@ class ModelVehicleTrackingConfigurator(QObject):
     def init_ui_data(self) -> None:
         # TODO: Implement the function into the code. Sets basic first data.
         print("!! IMPLEMENTATION NEEDED !!")
-        
+
     @Slot(bool, bool, bool)  # type: ignore[arg-type]
     def updated_mode(self, roi_state: bool, t_point_state: bool, time_tracking_state: bool) -> None:
         print(f"roi_state: {roi_state}\n t_point_state: {t_point_state}\n time_tracking_state: {time_tracking_state}\n")
