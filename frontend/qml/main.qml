@@ -62,8 +62,8 @@ Window {
     function onPointsDrawerClicked(x, y) {
         vehicle_tracking_configurator_model.points_drawer_clicked(x, y);
     }
-    function onStatesUpdated(roi_state, t_point_state, world_state) {
-        vehicle_tracking_configurator_model.updated_mode(roi_state, t_point_state, world_state);
+    function onStatesUpdated(roi_state, t_point_state, time_tracking_state) {
+        vehicle_tracking_configurator_model.updated_mode(roi_state, t_point_state, time_tracking_state);
     }
 
     Rectangle {
@@ -244,7 +244,7 @@ Window {
 
                     Rectangle {
                         id: regionOfInterestPointsCover
-                        visible: true
+                        visible: false
                         anchors.fill: parent
                         color: "black"
                         opacity: 0.5
@@ -400,14 +400,6 @@ Window {
 
                             buttonText: "White"
                         }
-                    }
-
-                    Rectangle {
-                        id: worldCordCover
-                        visible: true
-                        anchors.fill: parent
-                        color: "black"
-                        opacity: 0.5
                     }
                 }
 

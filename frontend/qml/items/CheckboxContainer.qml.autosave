@@ -40,7 +40,7 @@ Item {
                         timeTrackingCheckbox.checked = false
                         transformationPointsCheckbox.checked = false
 
-                        window.onStatesUpdated(regionOfInterestCheckbox.checked, transformationPointsCheckbox.checked, timeTrackingCheckbox.checked)
+                        window.onStatesUpdated(regionOfInterestCheckbox.checked, transformationPointsCheckbox.checked, timeTrackingCheckbox .checked)
 
                         regionOfInterestPointsCover.visible = !regionOfInterestCheckbox.checked
                         transformationPointsCover.visible = !transformationPointsCheckbox.checked
