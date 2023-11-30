@@ -14,11 +14,12 @@ Window {
 
     property color backgroundColor: "#0f0e17"
     property color headlineColor: "#fffffe"
-    property color buttonColor: "#ff8906"
-    property color hoverButtonColor: "#ffad52"
+    property color buttonColor: "#658e8e"
+    property color hoverButtonColor: "#99b5b5"
     property color buttonTextColor: "#fffffe"
+    property color buttonSelectColor: "#2c4444"
     property color placeholderColor: "#505050"
-    property color accentColor: "#f25f4c"
+    property color accentColor: "#162424"
     property color accentColor2: "#e53170"
     property int videosX: window.width * 0.37109375
     property int videosY: window.height * 0.490740
