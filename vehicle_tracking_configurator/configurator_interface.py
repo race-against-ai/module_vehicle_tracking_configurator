@@ -6,7 +6,7 @@ from pathlib import Path
 from json import load
 import sys
 
-from PySide6.QtCore import Qt, QSize, Slot
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QGuiApplication, QImage
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickImageProvider
@@ -51,7 +51,7 @@ class ConfiguratorInterface:
         self.__engine = QQmlApplicationEngine()
         self.__configuration_handler = ConfiguratorHandler()
 
-        self.__vehicle_tracking_configurator_model = ModelVehicleTrackingConfigurator()
+        self.__vehicle_tracking_configurator_model = ModelVehicleTrackingConfigurator(self.__configuration_handler)
 
         self.__frames_receiver = pynng.Sub0(dial=self.__recv_frames_address, block_on_dial=False)
         self.__frames_receiver.subscribe("")
@@ -75,6 +75,8 @@ class ConfiguratorInterface:
         self.__send_next_images_thread = Thread(target=self.__send_next_images_worker)
         self.__send_next_images_thread.start()
 
+        self.__vehicle_tracking_configurator_model.init_ui_data()
+
     def __send_next_images_worker(self) -> None:
         """A function that constantly sends new images to the UI."""
         while not self.__stop_thread_event.is_set():
@@ -85,10 +87,6 @@ class ConfiguratorInterface:
             self.__point_shower_image_provider.img = QImage(shower_frame, 1332, 990, QImage.Format_BGR888)  # type: ignore[attr-defined]
 
             self.__vehicle_tracking_configurator_model.reload_image.emit()
-
-    @Slot(str)
-    def on_text_changed(self, new_text):
-        print(f"Text changed: {new_text}")
 
     def run(self) -> None:
         """Run the QT application."""

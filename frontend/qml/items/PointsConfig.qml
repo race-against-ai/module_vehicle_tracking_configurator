@@ -8,8 +8,20 @@ Rectangle {
     id: pointsConfig
 
     property string configName
+    property string chosenPointDefaultText
 
     color: window.accentColor
+
+    function setPoints(coords) {
+        imagePointXInput.text = coords[0];
+        imagePointYInput.text = coords[1];
+        realPointXInput.text = coords[2];
+        realPointYInput.text = coords[3];
+    }
+
+    function setChosenPoint(chosenPoint) {
+        chosenConfigText.text = chosenPoint;
+    }
 
     Text {
         id: configNameText
@@ -126,7 +138,7 @@ Rectangle {
             hoverEnabled: true
 
             onClicked: {
-                window.onDeleteButtonClicked(configName);
+                vehicle_tracking_configurator_model.delete_button_clicked(configName);
             }
         }
     }
@@ -169,7 +181,7 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    window.onArrowButtonClicked(pointsConfig.configName, "left");
+                    vehicle_tracking_configurator_model.arrow_button_clicked(pointsConfig.configName, "left");
                 }
             }
         }
@@ -201,7 +213,7 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    window.onArrowButtonClicked(pointsConfig.configName, "right");
+                    vehicle_tracking_configurator_model.arrow_button_clicked(pointsConfig.configName, "right");
                 }
             }
         }
@@ -223,7 +235,7 @@ Rectangle {
                 anchors.centerIn: parent
                 horizontalAlignment: Text.AlignHCenter
 
-                text: "Placeholder"
+                text: pointsConfig.chosenPointDefaultText
                 minimumPointSize: 10
                 font.pointSize: 60
                 fontSizeMode: Text.Fit

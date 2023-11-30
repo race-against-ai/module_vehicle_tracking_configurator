@@ -10,6 +10,13 @@ Rectangle {
 
     color: window.accentColor
 
+    function setPoints(points) {
+        imagePointXInput.text = points[0];
+        imagePointYInput.text = points[1];
+        realPointXInput.text = points[2];
+        realPointYInput.text = points[3];
+    }
+
     Text {
         id: configNameText
 

@@ -8,6 +8,7 @@ Rectangle {
 
     property string assingedColor
     property string placeholderText
+    property string text
 
     color: "transparent"
 
@@ -32,6 +33,8 @@ Rectangle {
     TextField {
         id: colorTextField
 
+        text: colorTextContainer.text
+
         height: parent.height / 2
         width: parent.width
 
@@ -42,12 +45,13 @@ Rectangle {
         anchors.topMargin: 5
         horizontalAlignment: Text.AlignHCenter
 
-
         font.pixelSize: 25
         color: window.headlineColor
 
+        validator: IntValidator { bottom: 0; top: 255 }
+
         onTextEdited: {
-            window.onColorTextChanged(assingedColor, colorTextField.text)
+            vehicle_tracking_configurator_model.color_text_changed(assingedColor, colorTextField.text);
         }
 
         background: Rectangle {

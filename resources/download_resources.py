@@ -7,7 +7,7 @@ from json import load
 
 def main() -> None:
     current_dir = Path(__file__).parent
-    with open(current_dir.parent / "vehicle_tracking_config.json", "r") as f:
+    with open(current_dir.parent / "vehicle_tracking_configurator_config.json", "r") as f:
         config: dict[str, Any] = load(f)["resource_downloader"]
 
     webdav_url = config["url"]
