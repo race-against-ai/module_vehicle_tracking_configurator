@@ -37,6 +37,34 @@ Window {
 
     title: "Configurator Interface"
 
+    function onConfigButtonPressed(button_text) {
+        vehicle_tracking_configurator_model.config_button_pressed(button_text);
+    }
+    function onCoordinateTextChanged(input_id, config_name, text) {
+        vehicle_tracking_configurator_model.coordinate_text_changed(input_id, config_name, text);
+    }
+    function onColorTextChanged(input_id, text) {
+        vehicle_tracking_configurator_model.color_text_changed(input_id, text);
+    }
+    function onDeleteButtonClicked(config_name) {
+        vehicle_tracking_configurator_model.delete_button_clicked(config_name);
+    }
+    function onArrowButtonClicked(config_name, direction) {
+        vehicle_tracking_configurator_model.arrow_button_clicked(config_name, direction);
+    }
+    function onColorChooserButtonClicked(buttonColor) {
+        vehicle_tracking_configurator_model.color_chooser_button_clicked(buttonColor);
+    }
+    function onPointsShowerClicked(x, y) {
+        vehicle_tracking_configurator_model.points_shower_clicked(x, y);
+    }
+    function onPointsDrawerClicked(x, y) {
+        vehicle_tracking_configurator_model.points_drawer_clicked(x, y);
+    }
+    function onStatesUpdated(roi_state, t_point_state, time_tracking_state) {
+        vehicle_tracking_configurator_model.updated_mode(roi_state, t_point_state, time_tracking_state);
+    }
+
     Rectangle {
         id: pointsDrawer
 
@@ -196,6 +224,12 @@ Window {
                 width: parent.width - vertScrollBar.width
                 spacing: 5
 
+                CheckboxContainer {
+                    id: checkboxContainer
+                    width: parent.width
+                    height: parent.height / 10
+                }
+
                 PointsConfig {
                     id: regionOfInterestPoints
 
@@ -204,6 +238,14 @@ Window {
 
                     configName: "Region of Interest"
                     chosenPointDefaultText: "new"
+
+                    Rectangle {
+                        id: regionOfInterestPointsCover
+                        visible: false
+                        anchors.fill: parent
+                        color: "black"
+                        opacity: 0.5
+                    }
                 }
 
                 PointsConfig {
@@ -214,6 +256,14 @@ Window {
 
                     configName: "Transformation Points"
                     chosenPointDefaultText: "top_left"
+
+                    Rectangle {
+                        id: transformationPointsCover
+                        visible: true
+                        anchors.fill: parent
+                        color: "black"
+                        opacity: 0.5
+                    }
                 }
 
                 Item {

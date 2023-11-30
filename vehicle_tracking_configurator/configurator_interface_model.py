@@ -38,6 +38,10 @@ class ModelVehicleTrackingConfigurator(QObject):
         # TODO: Implement the function into the code. Sets basic first data.
         print("!! IMPLEMENTATION NEEDED !!")
 
+    @Slot(bool, bool, bool)  # type: ignore[arg-type]
+    def updated_mode(self, roi_state: bool, t_point_state: bool, time_tracking_state: bool) -> None:
+        print(f"roi_state: {roi_state}\n t_point_state: {t_point_state}\n time_tracking_state: {time_tracking_state}\n")
+
     @Slot(str)  # type: ignore[arg-type]
     def config_button_pressed(self, button_text: str) -> None:
         match button_text:
