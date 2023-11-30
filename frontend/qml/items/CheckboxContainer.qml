@@ -25,10 +25,11 @@ Item {
                 width: parent.width / 2
                 border.color: "black"
                 radius: 5
-                color: parent.checked ? "#8f4d0b" : window.buttonColor
+                color: parent.checked ? window.buttonSelectColor : window.buttonColor
 
                 Text {
                     text: "ROI"
+                    color: window.buttonTextColor
                     font.pixelSize: parent.height / 4
                     anchors.centerIn: parent
                 }
@@ -62,10 +63,11 @@ Item {
                 width: parent.width / 2
                 border.color: "black"
                 radius: 5
-                color: parent.checked ? "#8f4d0b" : window.buttonColor
+                color: parent.checked ? window.buttonSelectColor : window.buttonColor
 
                 Text {
                     text: "T-Points"
+                    color: window.buttonTextColor
                     font.pixelSize: parent.height / 4
                     anchors.centerIn: parent
                 }
@@ -99,10 +101,11 @@ Item {
                 width: parent.width / 2
                 border.color: "black"
                 radius: 5
-                color: parent.checked ? "#8f4d0b" : window.buttonColor
+                color: parent.checked ? window.buttonSelectColor : window.buttonColor
 
                 Text {
                     text: "Time Tracking"
+                    color: window.buttonTextColor
                     font.pixelSize: parent.height / 4
                     anchors.centerIn: parent
                 }
