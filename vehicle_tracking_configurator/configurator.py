@@ -341,7 +341,9 @@ class ConfiguratorHandler:
                 if current_index == len(self.region_of_interest_points):
                     return
                 self.region_of_interest_points.pop(current_index)
-                self.current_selected_point[REGION_OF_INTEREST] = np.clip(current_index, 0, len(self.region_of_interest_points))
+                self.current_selected_point[REGION_OF_INTEREST] = np.clip(
+                    current_index, 0, len(self.region_of_interest_points)
+                )
             case "Transformation Points":
                 current_index = str(self.current_selected_point[TRANSFORMATION_POINTS])
                 self.add_transformation_point((0, 0), (0.0, 0.0), current_index)
