@@ -75,8 +75,6 @@ class ConfiguratorInterface:
         self.__send_next_images_thread = Thread(target=self.__send_next_images_worker)
         self.__send_next_images_thread.start()
 
-        self.__vehicle_tracking_configurator_model.init_ui_data()
-
     def __send_next_images_worker(self) -> None:
         """A function that constantly sends new images to the UI."""
         while not self.__stop_thread_event.is_set():
