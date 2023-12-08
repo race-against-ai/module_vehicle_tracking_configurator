@@ -1,7 +1,7 @@
+"""The interface model for the configurator."""
 # Copyright (C) 2023, NG:ITL
 
-from PySide6.QtCore import QObject, Signal, Slot, SignalInstance
-from numpy import clip
+from PySide6.QtCore import QObject, Signal, Slot
 
 from vehicle_tracking_configurator.configurator import ConfiguratorHandler
 
@@ -31,19 +31,61 @@ class ModelVehicleTrackingConfigurator(QObject):
     def __init__(self, configurator: ConfiguratorHandler) -> None:
         QObject.__init__(self)
         self.__configurator = configurator
-        self.__current_selected_point: dict[str, str | int] = {REGION_OF_INTEREST: 1, TRANSFORMATION_POINTS: "top_left"}
-        self.__transformation_points = ["top_left", "top_right", "bottom_left", "bottom_right"]
 
-    def init_ui_data(self) -> None:
-        # TODO: Implement the function into the code. Sets basic first data.
-        print("!! IMPLEMENTATION NEEDED !!")
+        self.__active_mode: str = REGION_OF_INTEREST
+
+    def update_ui_data(self, to_update: str) -> None:
+        """Updates the data in the UI.
+
+        Args:
+            to_update (str): The name of the data to update.
+        """
+        current_point: int | str
+        match to_update:
+            case "Region of Interest":
+                current_point = int(self.__configurator.current_selected_point[REGION_OF_INTEREST])
+                current_data: tuple[int, int]
+                real_points: tuple[float, float]
+                if current_point == len(self.__configurator.region_of_interest_points):
+                    current_data = (0, 0)
+                    real_points = (0, 0)
+                    self.region_of_interest_point_chosen_signal.emit("new")
+                else:
+                    current_data = self.__configurator.region_of_interest_points[current_point]
+                    real_points = self.__configurator.get_real_world_point(current_data)
+                data = [current_data[0], current_data[1], str(real_points[0]), str(real_points[1])]
+                self.region_of_interest_points_changed_signal.emit(data)
+            case "Transformation Points":
+                current_point = str(self.__configurator.current_selected_point[TRANSFORMATION_POINTS])
+                complete_data = self.__configurator.configured_transformation_points[current_point]
+                image_coords = complete_data["image"]
+                real_coords = complete_data["real"]
+                data = [real_coords[0], real_coords[1], str(image_coords[0]), str(image_coords[1])]
+                self.transformation_points_changed_signal.emit(data)
 
     @Slot(bool, bool, bool)  # type: ignore[arg-type]
     def updated_mode(self, roi_state: bool, t_point_state: bool, time_tracking_state: bool) -> None:
-        print(f"roi_state: {roi_state}\n t_point_state: {t_point_state}\n time_tracking_state: {time_tracking_state}\n")
+        """A function that is called from the frontend when the mode is changed.
+
+        Args:
+            roi_state (bool): Region of Interest active.
+            t_point_state (bool): Transformation Points active.
+            time_tracking_state (bool): Time Tracking active.
+        """
+        if roi_state:
+            self.__active_mode = REGION_OF_INTEREST
+        elif t_point_state:
+            self.__active_mode = TRANSFORMATION_POINTS
+        elif time_tracking_state:
+            self.__active_mode = "Time Tracking"
 
     @Slot(str)  # type: ignore[arg-type]
     def config_button_pressed(self, button_text: str) -> None:
+        """A function that is called from the frontend when a config button is pressed.
+
+        Args:
+            button_text (str): The text of the button that was pressed.
+        """
         match button_text:
             case "Receive Config":
                 self.__configurator.receive_config()
@@ -52,129 +94,117 @@ class ModelVehicleTrackingConfigurator(QObject):
 
     @Slot(str, str, str)  # type: ignore[arg-type]
     def coordinate_text_changed(self, input_id: str, config_name: str, text: str) -> None:
-        # TODO: Modify this to work with changing real world points
-        # * Input: "imagePointXInput | Region of Interest | 1"
-        if self.__current_selected_point[REGION_OF_INTEREST] == len(self.__configurator.region_of_interest_points):
-            self.__configurator.region_of_interest_points.append((0, 0))
+        """A function that is called from the frontend when a coordinate text is changed.
 
-        point_index = 0 if input_id.find("X") != -1 else 1
-        is_image_point = input_id.find("image") != -1
+        Args:
+            input_id (str): The id of the input that was changed.
+            config_name (str): The name of the config that was changed.
+            text (str): The new text of the input.
+        """
+        is_image_coord = input_id.startswith("imagePoint")
+        coord_index = 0 if input_id.endswith("XInput") else 1
 
-        if len(text) == 0:
-            current_point_tuple = self.__configurator.region_of_interest_points[
-                int(self.__current_selected_point[REGION_OF_INTEREST])
-            ]
-            current_point = list(current_point_tuple)
-            current_point_tuple = (current_point[0], current_point[1])
-            current_point[point_index] = 0
-            match config_name:
-                case "Region of Interest":
-                    if is_image_point:
-                        real_x, real_y = self.__configurator.get_real_world_point(current_point_tuple)
-                        self.region_of_interest_points_changed_signal.emit(
-                            [current_point[0], current_point[1], real_x, real_y]
-                        )
-                    else:
-                        raise NotImplementedError()
-                case "Transformation Points":
-                    if is_image_point:
-                        real_x, real_y = self.__configurator.get_real_world_point(current_point_tuple)
-                        self.real_world_points_changed_signal.emit([current_point[0], current_point[1], real_x, real_y])
-                    else:
-                        raise NotImplementedError()
+        number = float(text) if len(text) > 0 else 0
+
+        match config_name:
+            case "Region of Interest":
+                image_x, image_y, real_x, real_y = self.__configurator.roi_config_text_changed(
+                    is_image_coord, coord_index, number
+                )
+                data = [real_x, real_y, str(image_x), str(image_y)]
+                self.region_of_interest_points_changed_signal.emit(data)
+            case "Transformation Points":
+                self.__configurator.transformation_config_text_changed(is_image_coord, coord_index, number)
 
     @Slot(str, str)  # type: ignore[arg-type]
     def color_text_changed(self, input_id: str, text: str) -> None:
-        value_names = {"red": 0, "green": 1, "blue": 2, "alpha": 3}
-        color_index = value_names[input_id]
+        """A function that is called from the frontend when a color text is changed.
 
-        if len(text) == 0:
-            color_list = list(self.__configurator.roi_color)
-            color_list[color_index] = 0
-            self.__configurator.roi_color = (color_list[0], color_list[1], color_list[2], color_list[3])
-            self.color_text_changed_signal.emit([str(clr) for clr in self.__configurator.roi_color])
-            return
-
-        value = int(text)
-        value_clipped = clip(value, 0, 255)
-
-        color_list = list(self.__configurator.roi_color)
-        color_list[color_index] = value_clipped
-        self.__configurator.roi_color = (color_list[0], color_list[1], color_list[2], color_list[3])
-
-        if value != value_clipped:
-            self.color_text_changed_signal.emit([str(clr) for clr in self.__configurator.roi_color])
+        Args:
+            input_id (str): The id of the input that was changed.
+            text (str): The new text of the input.
+        """
+        color = self.__configurator.roi_color_changed(input_id, text)
+        self.color_text_changed_signal.emit([int(i) for i in color])
 
     @Slot(str)  # type: ignore[arg-type]
     def delete_button_clicked(self, config_name: str) -> None:
-        if config_name in ["region_of_interest", "transformation_points"]:
-            points: tuple[int, str] = (
-                int(self.__current_selected_point[REGION_OF_INTEREST]),
-                str(self.__current_selected_point[TRANSFORMATION_POINTS]),
-            )
-            self.__configurator.delete_button_pressed(config_name, points)
+        """A function that is called from the frontend when a delete button is clicked.
+
+        Args:
+            config_name (str): The name of the delete button that was pressed.
+        """
+        self.__configurator.delete_button_pressed(config_name)
+        self.update_ui_data(config_name)
 
     @Slot(str, str)  # type: ignore[arg-type]
     def arrow_button_clicked(self, config_name: str, direction: str) -> None:
+        """A function that is called from the frontend when an arrow button is clicked.
+
+        Args:
+            config_name (str): The name of the config that was changed.
+            direction (str): The direction of the arrow button that was pressed.
+        """
+        if config_name == "button":
+            config_name = self.__active_mode
+        new_name, coords = self.__configurator.arrow_button_clicked(config_name, direction)
         match config_name:
-            case "Transformation Points":
-                current_index = self.__transformation_points.index(
-                    str(self.__current_selected_point[TRANSFORMATION_POINTS])
-                )
-                next_index = (current_index + 1 if direction == "right" else current_index - 1) % 4
-                next_name = self.__transformation_points[next_index]
-                self.__current_selected_point[TRANSFORMATION_POINTS] = next_name
-                conf = self.__configurator.transformation_points[next_name]
-                image_coords = conf["image"]
-                real_coords = conf["real_world"]
-                self.transformation_point_chosen_signal.emit(next_name)
-                self.transformation_points_changed_signal.emit(
-                    [image_coords[0], image_coords[1], real_coords[0], real_coords[1]]
-                )
             case "Region of Interest":
-                current_index = int(self.__current_selected_point[REGION_OF_INTEREST])
-                to_modulo_with = len(self.__configurator.region_of_interest_points) + 1
-                next_index = (current_index + 1 if direction == "right" else current_index - 1) % to_modulo_with
-                self.__current_selected_point[REGION_OF_INTEREST] = next_index
-                point_text = str(next_index)
-                if next_index == to_modulo_with - 1:
-                    point_text = "new"
-                    image_coords, real_coords = (0, 0), (0.0, 0.0)
-                else:
-                    image_coords = self.__configurator.region_of_interest_points[
-                        int(self.__current_selected_point[REGION_OF_INTEREST])
-                    ]
-                    real_coords = self.__configurator.get_real_world_point((image_coords[0], image_coords[1]))
-                self.region_of_interest_point_chosen_signal.emit(point_text)
-                self.region_of_interest_points_changed_signal.emit(
-                    [image_coords[0], image_coords[1], real_coords[0], real_coords[1]]
-                )
+                self.region_of_interest_point_chosen_signal.emit(new_name)
+                self.region_of_interest_points_changed_signal.emit(list(coords))
+            case "Transformation Points":
+                self.transformation_point_chosen_signal.emit(new_name)
+                self.transformation_points_changed_signal.emit(list(coords))
 
     @Slot(str)  # type: ignore[arg-type]
     def color_chooser_button_clicked(self, button_color: str) -> None:
-        color: tuple[int, int, int, int] | None = None
-        match button_color.lower():
-            case "white":
-                color = (255, 255, 255, 255)
-            case "gray":
-                color = (64, 64, 64, 192)
-            case "black":
-                color = (0, 0, 0, 255)
-        if color:
-            self.__configurator.roi_color = color
-            self.color_text_changed_signal.emit([str(clr) for clr in color])
+        """A function that is called from the frontend when a color chooser button is clicked.
 
-    @Slot(int, int, int, int)  # type: ignore[arg-type]
-    def points_drawer_clicked(self, x: int, y: int, video_width: int, video_height: int) -> None:
-        width_factor = 1332 / video_width
-        height_factor = 990 / video_height
-        x, y = int((x * width_factor)), int((y * height_factor))
-        self.__configurator.configure_points((x, y))
+        Args:
+            button_color (str): The name of the color chooser button that was pressed.
+        """
+        color = self.__configurator.color_chooser_button(button_color)
+        self.color_text_changed_signal.emit(list(color))
 
-    @Slot(int, int, int, int)  # type: ignore[arg-type]
-    def points_shower_clicked(self, x: int, y: int, video_width: int, video_height: int) -> None:
-        width_factor = 1332 / video_width
-        height_factor = 990 / video_height
-        x, y = int((x * width_factor)), int((y * height_factor))
-        real_world = self.__configurator.get_real_world_point((x, y))
-        self.real_world_points_changed_signal.emit([str(i) for i in [x, y, real_world[0], real_world[1]]])
+    @Slot(int, int, int, int, int, int)  # type: ignore[arg-type]
+    def points_drawer_clicked(
+        self, x: int, y: int, video_width: int, video_height: int, full_width: int, full_height: int
+    ) -> None:
+        """A function that is called from the frontend when the points drawer is clicked.
+
+        Args:
+            x (int): X coordinate of the click.
+            y (int): Y coordinate of the click.
+            video_width (int): The height of the displayed video.
+            video_height (int): The width of the displayed video.
+            full_width (int): The height of the video container.
+            full_height (int): The width of the video container.
+        """
+        points = self.__configurator.points_drawer_clicked(
+            self.__active_mode, (x, y), (video_width, video_height), (full_width, full_height)
+        )
+        match self.__active_mode:
+            case "Region of Interest":
+                self.region_of_interest_points_changed_signal.emit(list(points))
+            case "Transformation Points":
+                self.transformation_points_changed_signal.emit(list(points))
+
+    @Slot(int, int, int, int, int, int)  # type: ignore[arg-type]
+    def points_shower_clicked(
+        self, x: int, y: int, video_width: int, video_height: int, full_width: int, full_height: int
+    ) -> None:
+        """A function that is called from the frontend when the points shower is clicked.
+
+        Args:
+            x (int): X coordinate of the click.
+            y (int): Y coordinate of the click.
+            video_width (int): The height of the displayed video.
+            video_height (int): The width of the displayed video.
+            full_width (int): The height of the video container.
+            full_height (int): The width of the video container.
+        """
+        points = self.__configurator.points_shower_clicked(
+            (x, y), (video_width, video_height), (full_width, full_height)
+        )
+
+        self.real_world_points_changed_signal.emit(list(points))
