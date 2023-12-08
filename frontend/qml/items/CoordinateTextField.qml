@@ -1,4 +1,5 @@
 // Copyright (C) 2023 NGITL
+
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
@@ -13,6 +14,8 @@ TextField {
     anchors.topMargin: 5
     anchors.leftMargin: 5
     horizontalAlignment: Text.AlignHCenter
+
+    text: "0"
 
     font.pixelSize: 25
     color: window.headlineColor
