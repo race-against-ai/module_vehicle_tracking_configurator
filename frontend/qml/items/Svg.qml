@@ -1,4 +1,5 @@
-// Copyright (C) 2022 twyleg
+// Copyright (C) 2023 NGITL
+
 import QtQuick 2.0
 
 Image {
