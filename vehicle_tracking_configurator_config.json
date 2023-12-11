@@ -1,13 +1,6 @@
 {
 	"pynng": {
-		"publishers": {
-			"config_sender": {
-				"address": "ipc:///tmp/RAAI/new_config.ipc",
-				"topics": {
-					"tracker": "vehicle_tracking"
-				}
-			}
-		},
+		"publishers": {},
 		"subscribers": {
 			"camera_frame_receiver": {
                 "address": "ipc:///tmp/RAAI/camera_frame.ipc",
