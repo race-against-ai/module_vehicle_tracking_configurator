@@ -111,10 +111,16 @@ class ModelVehicleTrackingConfigurator(QObject):
                 image_x, image_y, real_x, real_y = self.__configurator.roi_config_text_changed(
                     is_image_coord, coord_index, number
                 )
-                data = [real_x, real_y, str(image_x), str(image_y)]
+                data = [image_x, image_y, str(real_x), str(real_y)]
                 self.region_of_interest_points_changed_signal.emit(data)
             case "Transformation Points":
                 self.__configurator.transformation_config_text_changed(is_image_coord, coord_index, number)
+            case "Real World Coordinate Points":
+                image_x, image_y, real_x, real_y = self.__configurator.real_world_config_text_changed(
+                    is_image_coord, coord_index, number
+                )
+                data = [image_x, image_y, str(real_x), str(real_y)]
+                self.real_world_points_changed_signal.emit(data)
 
     @Slot(str, str)  # type: ignore[arg-type]
     def color_text_changed(self, input_id: str, text: str) -> None:
