@@ -42,7 +42,6 @@ Window {
         focus: true
 
         Keys.onPressed: (event) => {
-            // TODO: Implement that you can switch modes using the up and down arrow keys.
             if (event.key == Qt.Key_Left) {
                 vehicle_tracking_configurator_model.arrow_button_clicked("button", "left");
                 event.accepted = true;
