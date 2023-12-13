@@ -58,12 +58,7 @@ class ConfiguratorHandler:
         self.__transformation_points = ["top_left", "top_right", "bottom_left", "bottom_right"]
         self.region_of_interest_points: list[tuple[int, int]] = []
         self.__last_tested: tuple[int, int, float, float] = (0, 0, 0.0, 0.0)
-        self.configured_transformation_points: dict[str, dict[str, tuple[float, float] | tuple[int, int]]] = {
-            "top_left": {"real_world": (0, 0), "image": (0, 0)},
-            "top_right": {"real_world": (0, 0), "image": (0, 0)},
-            "bottom_left": {"real_world": (0, 0), "image": (0, 0)},
-            "bottom_right": {"real_world": (0, 0), "image": (0, 0)},
-        }
+        self.__reset_transformation_points()
         self.__topview_transformation = TopviewTransformation()
 
         self.roi_color: tuple[int, int, int, int] = (0, 0, 0, 255)
