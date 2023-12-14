@@ -2,11 +2,11 @@
 
 ## Setup
 
-You need to install all the required packages in the requirements.txt file. It is recommended to use a virtual environment. Replace `<VENV_NAME>` with the name of your virtual environment.
+You need to install all the required packages in the requirements.txt file. It is recommended to use a virtual environment.
 
 ```bash
-python.exe -m venv <VENV_NAME>
-call <VENV_NAME>\Scripts\activate.bat
+python.exe -m venv venv
+call venv\Scripts\activate.bat
 pip install -r requirements.txt
 ```
 
