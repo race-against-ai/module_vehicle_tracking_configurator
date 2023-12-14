@@ -16,7 +16,7 @@ Rectangle {
 
     color: mouseHandler.containsMouse ? window.hoverButtonColor : window.buttonColor
 
-    property string buttonText
+    property alias buttonText: buttonText.text
 
     MouseArea {
         id: mouseHandler
@@ -31,8 +31,7 @@ Rectangle {
     }
 
     Text {
-        // Button Text
-        text: parent.buttonText
+        id: buttonText
         color: window.buttonTextColor
         font.pixelSize: 30
 
