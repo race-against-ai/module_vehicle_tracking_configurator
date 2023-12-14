@@ -9,5 +9,4 @@ Image {
 
 	sourceSize.height: height
 	sourceSize.width: width
-
 }
