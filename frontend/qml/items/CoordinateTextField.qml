@@ -28,6 +28,8 @@ TextField {
     }
 
     background: Rectangle {
+        id: coordInputBackground
+
         color: window.buttonColor
     }
 }
