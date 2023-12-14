@@ -12,7 +12,7 @@ pip install -r requirements.txt
 
 ## Download pre-recorded videos (optional)
 
-You can use the [download_resources.py](resources/download_resources.py) script to download pre-recorded videos from the NG:ITL cloud. The downloaded files are stored in the [resources](resources) folder.
+You can use the [download_resources.py](utils/download_resources.py) script to download pre-recorded videos from the NG:ITL cloud. The downloaded files are stored in the [resources](resources) folder.
 
 To use the pre-recorded videos you will need to make sure that no other program is using the `ipc:///tmp/RAAI/camera_frame.ipc` address.
 

@@ -164,4 +164,3 @@ cython_debug/
 
 # Resources Folder
 resources
-!resources/download_resources.py
