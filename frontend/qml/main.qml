@@ -87,7 +87,6 @@ Window {
                 anchors.fill: parent
 
                 onClicked: {
-                    // Get the actual width of the video
                     vehicle_tracking_configurator_model.points_drawer_clicked(
                         pointsDrawerMouseArea.mouseX,
                         pointsDrawerMouseArea.mouseY,
@@ -268,7 +267,7 @@ Window {
                     }
 
                     Item {
-                        // Container for Real World Coordinates and Color Picker Buttons
+                        id: realWorldAndColorPickerContainer
 
                         height: optionsRectangle.confBoxSizeY
                         width: parent.width
@@ -285,7 +284,7 @@ Window {
                         }
 
                         Rectangle {
-                            // Color picker buttons
+                            id: colorPickerContainer
 
                             anchors.left: realWorldCoordinatePoints.right
                             anchors.leftMargin: 5
