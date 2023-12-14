@@ -3,9 +3,9 @@
 		"publishers": {},
 		"subscribers": {
 			"camera_frame_receiver": {
-                "address": "ipc:///tmp/RAAI/camera_frame.ipc",
-                "topics": {}
-            },
+	            "address": "ipc:///tmp/RAAI/camera_frame.ipc",
+	            "topics": {}
+	        },
 			"tracker_config": {
 				"address": "ipc:///tmp/RAAI/tracker_config.ipc",
 				"topics": {}
@@ -13,8 +13,8 @@
 		}
 	},
 	"resource_downloader": {
-        "url": "https://cloud.ngitl.dev/remote.php/dav/files/raai_download/",
-        "client_name": "raai_download",
-        "client_password": "mJpyehF5M5ehWJQKBsxOcW3ctn2tm4Ip"
-    }
+	    "url": "https://cloud.ngitl.dev/remote.php/dav/files/raai_download/",
+	    "client_name": "raai_download",
+	    "client_password": "mJpyehF5M5ehWJQKBsxOcW3ctn2tm4Ip"
+	}
 }
