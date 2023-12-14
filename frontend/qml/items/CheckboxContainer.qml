@@ -9,6 +9,8 @@ Item {
     property int items: 3
 
     Rectangle {
+        id: modeContainerBackground
+
         anchors.fill: parent
         color: window.accentColor
     }
@@ -24,7 +26,7 @@ Item {
             height: parent.parent.height
 
             Rectangle {
-                // Button Background
+                id: regionOfInterestButtonBackground
 
                 anchors.centerIn: parent
                 height: parent.height * 0.8
@@ -35,7 +37,7 @@ Item {
                 radius: 5
 
                 Text {
-                    // Button Text
+                    id: buttonText
 
                     text: "ROI"
                     color: window.buttonTextColor
@@ -81,7 +83,7 @@ Item {
                 radius: 5
 
                 Text {
-                    // Button Text
+                    id: transformationPointsButtonText
 
                     text: "T-Points"
                     color: window.buttonTextColor
@@ -116,7 +118,7 @@ Item {
             height: parent.parent.height
 
             Rectangle {
-                // Button Background
+                id: timeTrackingButtonBackground
 
                 anchors.centerIn: parent
                 height: parent.height * 0.8
@@ -127,7 +129,7 @@ Item {
                 radius: 5
 
                 Text {
-                    // Button Text
+                    id: timeTrackingButtonText
 
                     text: "Time Tracking"
                     color: window.buttonTextColor
