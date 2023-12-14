@@ -3,13 +3,11 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-import "../items"
-
 Rectangle {
     id: pointsConfig
 
-    property string configName
-    property string chosenPointDefaultText
+    property alias configName: configNameText.text
+    property alias chosenPointDefaultText: chosenConfigText.text
 
     color: window.accentColor
 
@@ -125,8 +123,9 @@ Rectangle {
         color: mouseHandler.containsMouse ? "#30ffffff" : "transparent"
 
         Image {
-            // trash can image
-            source: "../../svg/bin.svg"
+            id: binImage
+
+            source: "../../assets/svg/bin.svg"
 
             anchors.fill: parent
         }
@@ -145,7 +144,7 @@ Rectangle {
     }
 
     Rectangle {
-        // Point Chooser
+        id: chooserContainer
         width: 300
         height: 50
         anchors.bottom: parent.bottom
@@ -165,7 +164,7 @@ Rectangle {
             color: leftArrowMouseHandler.containsMouse ? window.hoverButtonColor : "transparent"
 
             Text {
-                // Left arrow text
+                id: leftArrowText
                 anchors.fill: parent
                 text: "←"
                 minimumPointSize: 10
@@ -182,13 +181,13 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    vehicle_tracking_configurator_model.arrow_button_clicked(pointsConfig.configName, "left");
+                    vehicle_tracking_configurator_model.arrow_button_clicked(chosenConfigText.text, "left");
                 }
             }
         }
 
         Rectangle {
-            // Right arrow
+            id: rightArrow
             anchors.right: parent.right
             anchors.top: parent.top
             height: parent.height
@@ -197,7 +196,7 @@ Rectangle {
             color: rightArrowMouseHandler.containsMouse ? window.hoverButtonColor : "transparent"
 
             Text {
-                // right arrow
+                id: rightArrowText
                 anchors.fill: parent
                 text: "→"
                 minimumPointSize: 10
@@ -214,13 +213,13 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    vehicle_tracking_configurator_model.arrow_button_clicked(pointsConfig.configName, "right");
+                    vehicle_tracking_configurator_model.arrow_button_clicked(chosenConfigText.text, "right");
                 }
             }
         }
 
         Rectangle {
-            // Point Text
+            id: pointText
             height: parent.height
             width: parent.width - (30 * 2)
 
@@ -236,7 +235,6 @@ Rectangle {
                 anchors.centerIn: parent
                 horizontalAlignment: Text.AlignHCenter
 
-                text: pointsConfig.chosenPointDefaultText
                 minimumPointSize: 10
                 font.pointSize: 60
                 fontSizeMode: Text.Fit
