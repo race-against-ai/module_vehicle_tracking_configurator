@@ -9,7 +9,7 @@ Rectangle {
 
     color: mouseHandler.containsMouse ? window.hoverButtonColor : window.buttonColor
 
-    property string buttonText
+    property alias buttonText: buttonTextContainer.text
 
     MouseArea {
         id: mouseHandler
@@ -19,12 +19,13 @@ Rectangle {
         hoverEnabled: true
 
         onClicked: {
-            vehicle_tracking_configurator_model.color_chooser_button_clicked(buttonText);
+            vehicle_tracking_configurator_model.color_chooser_button_clicked(buttonTextContainer.text);
         }
     }
 
     Text {
-        // Button Text
+        id: buttonTextContainer
+
         text: buttonText
         color: window.buttonTextColor
         font.pixelSize: 20
