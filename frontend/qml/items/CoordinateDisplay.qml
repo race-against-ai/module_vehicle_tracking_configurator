@@ -2,12 +2,10 @@
 
 import QtQuick 2.15
 
-import "../items"
-
 Rectangle {
     id: pointsConfig
 
-    property string configName
+    property alias configName: configNameText.text
 
     color: window.accentColor
 
@@ -20,8 +18,6 @@ Rectangle {
 
     Text {
         id: configNameText
-
-        text: configName
 
         anchors.top: pointsConfig.top
         anchors.topMargin: 5
