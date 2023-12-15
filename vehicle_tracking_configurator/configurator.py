@@ -11,23 +11,11 @@ import numpy as np
 import cv2
 
 from vehicle_tracking_configurator.topview_transformation import TopviewTransformation
+from utils.shared_functions import find_base_directory, DirectoryNotFoundError
 
 
 REGION_OF_INTEREST = "Region of Interest"
 TRANSFORMATION_POINTS = "Transformation Points"
-
-
-def find_base_directory() -> Path:
-    """Find the base directory of the project. If not found exits the program.
-
-    Returns:
-        Path: The base directory.
-    """
-    search_paths = {Path().cwd(), Path().cwd().parent, Path(__file__).parent.parent}
-    for directory in search_paths:
-        if (directory / "vehicle_tracking_configurator_config.json").exists():
-            return directory
-    sys.exit(1)
 
 
 class ConfiguratorHandler:
@@ -37,8 +25,13 @@ class ConfiguratorHandler:
     __REAL_WORLD_SIZE = (7.5, 5.0)
 
     def __init__(self) -> None:
+        base_dir = find_base_directory()
+
+        if isinstance(base_dir, DirectoryNotFoundError):
+            raise base_dir
+
         with open(
-            find_base_directory() / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8"
+            base_dir / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8"
         ) as config_file:
             conf = load(config_file)
             pynng_config = conf["pynng"]
