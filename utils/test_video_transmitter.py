@@ -8,17 +8,13 @@ import sys
 import pynng
 import cv2
 
-
-def find_base_directory() -> Path:
-    """Find the base directory of the project."""
-    search_paths = {Path().cwd(), Path().cwd().parent, Path(__file__).parent.parent}
-    for directory in search_paths:
-        if (directory / "vehicle_tracking_configurator_config.json").exists():
-            return directory
-    sys.exit(1)
+from utils.shared_functions import find_base_directory, DirectoryNotFoundError
 
 
 base_dir = find_base_directory()
+
+if isinstance(base_dir, DirectoryNotFoundError):
+    raise base_dir
 
 source = cv2.VideoCapture(str(base_dir / "resources" / "test_video_1.h265"))
 
