@@ -14,15 +14,7 @@ import pynng
 
 from vehicle_tracking_configurator.configurator_interface_model import ModelVehicleTrackingConfigurator
 from vehicle_tracking_configurator.configurator import ConfiguratorHandler
-
-
-def find_base_directory() -> Path:
-    """Find the base directory of the project."""
-    search_paths = {Path().cwd(), Path().cwd().parent, Path(__file__).parent.parent}
-    for directory in search_paths:
-        if (directory / "vehicle_tracking_configurator_config.json").exists():
-            return directory
-    sys.exit(1)
+from utils.shared_functions import find_base_directory, DirectoryNotFoundError
 
 
 class StreamImageProvider(QQuickImageProvider):
@@ -43,7 +35,10 @@ class ConfiguratorInterface:
     def __init__(self) -> None:
         base_dir = find_base_directory()
 
-        with open(base_dir / "vehicle_tracking_configurator_config.json", "r") as config_file:
+        if isinstance(base_dir, DirectoryNotFoundError):
+            raise base_dir
+
+        with open(base_dir / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
             conf = load(config_file)
             self.__recv_frames_address = conf["pynng"]["subscribers"]["camera_frame_receiver"]["address"]
 
