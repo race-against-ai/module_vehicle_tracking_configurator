@@ -9,3 +9,6 @@ pynng~=0.7.2
 opencv-python~=4.8.1.78
 pillow~=10.1.0
 webdav4~=0.9.8
+PySide6-stubs~=6.4.2.0
+opencv-stubs~=0.0.8
+types-Pillow~=10.1.0.2
