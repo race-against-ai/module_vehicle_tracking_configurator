@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+"""Download all the resources from the webdav server."""
 # Copyright (C) 2023, NG:ITL
 
 from pathlib import Path
