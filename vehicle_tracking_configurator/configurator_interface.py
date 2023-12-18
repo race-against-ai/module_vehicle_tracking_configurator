@@ -64,7 +64,7 @@ class ConfiguratorInterface:
             self.__recv_frames_address = conf["pynng"]["subscribers"]["camera_frame_receiver"]["address"]
 
         self.__app = QGuiApplication()
-        self.__engine = QQmlApplicationEngine()8
+        self.__engine = QQmlApplicationEngine()
         self.__configuration_handler = ConfiguratorHandler()
 
         self.__vehicle_tracking_configurator_model = ModelVehicleTrackingConfigurator(self.__configuration_handler)
