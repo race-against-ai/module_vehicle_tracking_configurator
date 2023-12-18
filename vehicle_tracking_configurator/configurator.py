@@ -2,20 +2,26 @@
 # Copyright (C) 2023, NG:ITL
 
 from json import load, loads, dumps
-from pathlib import Path
-import sys
 
+from jsonschema.exceptions import ValidationError
+from jsonschema import validate
 from pynng import Sub0, Req0
 from PIL import Image
 import numpy as np
 import cv2
 
 from vehicle_tracking_configurator.topview_transformation import TopviewTransformation
-from utils.shared_functions import find_base_directory, DirectoryNotFoundError
+from utils.shared_functions import find_base_directory
 
 
+BASE_DIR, error = find_base_directory()
+SCHEMA_DIR = BASE_DIR / "vehicle_tracking_configurator" / "schema"
 REGION_OF_INTEREST = "Region of Interest"
 TRANSFORMATION_POINTS = "Transformation Points"
+
+if error:
+    raise error
+del error
 
 
 class ConfiguratorHandler:
@@ -25,15 +31,17 @@ class ConfiguratorHandler:
     __REAL_WORLD_SIZE = (7.5, 5.0)
 
     def __init__(self) -> None:
-        base_dir = find_base_directory()
-
-        if isinstance(base_dir, DirectoryNotFoundError):
-            raise base_dir
+        self.__schemas: dict[str, dict] = {}
+        for schema in SCHEMA_DIR.glob("*.json"):
+            with open(schema, "r", encoding="utf-8") as schema_file:
+                schema_name = schema.stem
+                self.__schemas[schema_name] = load(schema_file)
 
         with open(
-            base_dir / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8"
+            BASE_DIR / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8"
         ) as config_file:
             conf = load(config_file)
+            validate(conf, self.__schemas["configurator_config"])
             pynng_config = conf["pynng"]
             subscribers = pynng_config["subscribers"]
             recv_frames = subscribers["camera_frame_receiver"]
@@ -176,6 +184,11 @@ class ConfiguratorHandler:
         config_text_tracker = data.decode("utf-8")
         config_tracker = loads(config_text_tracker)
 
+        try:
+            validate(config_tracker, self.__schemas["tracker_config"])
+        except ValidationError as err:
+            self.__tracker_config_handler.send(b"ERROR " + str(err.message).encode("utf-8"))
+
         self.region_of_interest_points = []
         if config_tracker[REGION_OF_INTEREST]:
             for point in config_tracker[REGION_OF_INTEREST]:
@@ -183,15 +196,6 @@ class ConfiguratorHandler:
                     self.region_of_interest_points.append((point[0], point[1]))
         self.__reset_transformation_points()
         for point_name, point in config_tracker[TRANSFORMATION_POINTS].items():
-            if (
-                "image" not in point
-                or "real_world" not in point
-                or not isinstance(point["image"][0], int)
-                or not isinstance(point["image"][1], int)
-                or not isinstance(point["real_world"][0], float)
-                or not isinstance(point["real_world"][1], float)
-            ):
-                continue
             self.configured_transformation_points[point_name] = {
                 "image": (point["image"][0], point["image"][1]),
                 "real_world": (point["real_world"][0], point["real_world"][1]),
