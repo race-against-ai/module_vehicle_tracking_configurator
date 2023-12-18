@@ -2,9 +2,14 @@
 # Copyright (C) 2023, NG:ITL
 
 from pathlib import Path
+from json import load
+
+from typing import Any
 
 
 FILE_DIR = Path(__file__).parent
+BASE_DIR = FILE_DIR.parent
+SCHEMA_DIR = BASE_DIR / "vehicle_tracking_configurator" / "schema"
 
 
 class DirectoryNotFoundError(Exception):
@@ -31,3 +36,16 @@ def find_base_directory() -> tuple[Path, None | DirectoryNotFoundError]:
         if (directory / "vehicle_tracking_configurator_config.json").exists():
             return (directory, None)
     return (Path(), DirectoryNotFoundError("Base directory was not found."))
+
+def get_all_schemas() -> dict[str, dict[str, Any]]:
+    """Get all the schemas in the schemas directory.
+
+    Returns:
+        list[Path]: A list of all the schemas.
+    """
+    schemas: dict[str, dict[str, Any]] = {}
+    for schema in SCHEMA_DIR.glob("*.json"):
+        with open(schema, "r", encoding="utf-8") as schema_file:
+            schema_name = schema.stem
+            schemas[schema_name] = load(schema_file)
+    return schemas
