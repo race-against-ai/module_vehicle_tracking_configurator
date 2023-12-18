@@ -1,22 +1,22 @@
+"""Transmits a video file over IPC to the RAAI camera frame subscriber."""""
 # Copyright (C) 2023, NG:ITL
 
-from pathlib import Path
-import numpy as np
 import time
-import sys
 
+import numpy as np
 import pynng
 import cv2
 
-from utils.shared_functions import find_base_directory, DirectoryNotFoundError
+from utils.shared_functions import find_base_directory
 
 
-base_dir = find_base_directory()
+BASE_DIR, error = find_base_directory()
 
-if isinstance(base_dir, DirectoryNotFoundError):
-    raise base_dir
+if error:
+    raise error
+del error
 
-source = cv2.VideoCapture(str(base_dir / "resources" / "test_video_1.h265"))
+source = cv2.VideoCapture(str(BASE_DIR / "resources" / "test_video_1.h265"))
 
 pub = pynng.Pub0(listen="ipc:///tmp/RAAI/camera_frame.ipc")
 
