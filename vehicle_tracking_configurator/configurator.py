@@ -202,7 +202,7 @@ class ConfiguratorHandler:
         try:
             validate(config_tracker, self.__schemas["tracker_config"])
         except ValidationError as err:
-            self.__tracker_config_handler.send(b"ERROR " + str(err.message).encode("utf-8"))
+            self.__tracker_config_handler.send(b"ERROR " + err.message.encode("utf-8"))
 
         self.region_of_interest_points = []
         if config_tracker[REGION_OF_INTEREST]:
@@ -211,10 +211,11 @@ class ConfiguratorHandler:
                     self.region_of_interest_points.append((point[0], point[1]))
         self.__reset_transformation_points()
         for point_name, point in config_tracker[TRANSFORMATION_POINTS].items():
-            self.configured_transformation_points[point_name] = {
-                "image": (point["image"][0], point["image"][1]),
-                "real_world": (point["real_world"][0], point["real_world"][1]),
-            }
+            self.add_transformation_point(
+                (point["image"][0], point["image"][1]),
+                (point["real_world"][0], point["real_world"][1]),
+                point_name
+            )
         self.__tracker_config_handler.send(b"OK NONE")
 
     def send_config(self) -> None:
