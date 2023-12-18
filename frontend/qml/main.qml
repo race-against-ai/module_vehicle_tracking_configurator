@@ -116,7 +116,7 @@ Window {
 
                 Svg {
                     id: fullscreenButton
-                    source: "../svg/maximize.svg"
+                    source: "../assets/svg/maximize.svg"
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     height: parent.height * 0.1
@@ -131,12 +131,12 @@ Window {
 
                         onClicked: {
                             if(pointsDrawer.height == window.videosY) {
-                                fullscreenButton.source = "../svg/minimize.svg"
+                                fullscreenButton.source = "../assets/svg/minimize.svg"
                                 pointsDrawer.height = window.height
                                 pointsDrawer.width = window.width
                             }
                             else {
-                                fullscreenButton.source = "../svg/maximize.svg"
+                                fullscreenButton.source = "../assets/svg/maximize.svg"
                                 pointsDrawer.height = window.videosY
                                 pointsDrawer.width = window.videosX
                             }
