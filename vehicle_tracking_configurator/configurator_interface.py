@@ -8,11 +8,12 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QGuiApplication, QImage
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickImageProvider
+from jsonschema import validate
 import pynng
 
 from vehicle_tracking_configurator.configurator_interface_model import ModelVehicleTrackingConfigurator
 from vehicle_tracking_configurator.configurator import ConfiguratorHandler
-from utils.shared_functions import find_base_directory
+from utils.shared_functions import find_base_directory, get_all_schemas
 
 
 BASE_DIR, error = find_base_directory()
@@ -55,12 +56,15 @@ class ConfiguratorInterface:
     """A class for starting the QT application."""
 
     def __init__(self) -> None:
+        self.__schemas = get_all_schemas()
+
         with open(BASE_DIR / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
             conf = load(config_file)
+            validate(instance=conf, schema=self.__schemas["configurator_config"])
             self.__recv_frames_address = conf["pynng"]["subscribers"]["camera_frame_receiver"]["address"]
 
         self.__app = QGuiApplication()
-        self.__engine = QQmlApplicationEngine()
+        self.__engine = QQmlApplicationEngine()8
         self.__configuration_handler = ConfiguratorHandler()
 
         self.__vehicle_tracking_configurator_model = ModelVehicleTrackingConfigurator(self.__configuration_handler)

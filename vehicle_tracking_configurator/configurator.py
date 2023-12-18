@@ -2,6 +2,7 @@
 # Copyright (C) 2023, NG:ITL
 
 from json import load, loads, dumps
+from typing import NamedTuple
 
 from jsonschema.exceptions import ValidationError
 from jsonschema import validate
@@ -11,7 +12,7 @@ import numpy as np
 import cv2
 
 from vehicle_tracking_configurator.topview_transformation import TopviewTransformation
-from utils.shared_functions import find_base_directory
+from utils.shared_functions import find_base_directory, get_all_schemas
 
 
 BASE_DIR, error = find_base_directory()
@@ -24,6 +25,22 @@ if error:
 del error
 
 
+class PointData(NamedTuple):
+    """The data of a point.
+
+    Args:
+        image_x (int): The x coordinate of the point on the image.
+        image_y (int): The y coordinate of the point on the image.
+        real_x (float): The x coordinate of the point in the real world.
+        real_y (float): The y coordinate of the point in the real world.
+    """
+
+    image_x: int
+    image_y: int
+    real_x: float
+    real_y: float
+
+
 class ConfiguratorHandler:
     """Handles the backend of the configurator."""
 
@@ -32,10 +49,8 @@ class ConfiguratorHandler:
 
     def __init__(self) -> None:
         self.__schemas: dict[str, dict] = {}
-        for schema in SCHEMA_DIR.glob("*.json"):
-            with open(schema, "r", encoding="utf-8") as schema_file:
-                schema_name = schema.stem
-                self.__schemas[schema_name] = load(schema_file)
+
+        self.__schemas = get_all_schemas()
 
         with open(
             BASE_DIR / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8"
@@ -58,7 +73,7 @@ class ConfiguratorHandler:
         self.current_selected_point: dict[str, str | int] = {REGION_OF_INTEREST: 0, TRANSFORMATION_POINTS: "top_left"}
         self.__transformation_points = ["top_left", "top_right", "bottom_left", "bottom_right"]
         self.region_of_interest_points: list[tuple[int, int]] = []
-        self.__last_tested: tuple[int, int, float, float] = (0, 0, 0.0, 0.0)
+        self.__last_tested: PointData = PointData(0, 0, 0.0, 0.0)
         self.__reset_transformation_points()
         self.__topview_transformation = TopviewTransformation()
 
@@ -243,7 +258,7 @@ class ConfiguratorHandler:
 
     def roi_config_text_changed(
         self, is_image_coord: bool, coord_index: int, number: float
-    ) -> tuple[int, int, float, float]:
+    ) -> PointData:
         """Changes the ROI configuration.
 
         Args:
@@ -252,7 +267,7 @@ class ConfiguratorHandler:
             number (float): The converted value of the coordinate.
 
         Returns:
-            tuple[int, int, float, float]: The real world and image coordinates.
+            PointData: The real world and image coordinates.
         """
         current_index = int(self.current_selected_point[REGION_OF_INTEREST])
 
@@ -277,11 +292,15 @@ class ConfiguratorHandler:
             image_coords = self.get_image_point((real_coords[0], real_coords[1]))
             self.region_of_interest_points[current_index] = (image_coords[0], image_coords[1])
 
-        return int(image_coords[0]), int(image_coords[1]), float(real_coords_tuple[0]), float(real_coords_tuple[1])
+        data = PointData(
+            int(image_coords[0]), int(image_coords[1]), float(real_coords_tuple[0]), float(real_coords_tuple[1])
+        )
+
+        return data
 
     def transformation_config_text_changed(
         self, is_image_coord: bool, coord_index: int, number: float
-    ) -> tuple[int, int, float, float]:
+    ) -> PointData:
         """Changes the transformation configuration.
 
         Args:
@@ -290,7 +309,7 @@ class ConfiguratorHandler:
             number (int): The converted value of the coordinate.
 
         Returns:
-            tuple[int, int, float, float]: The real world and image coordinates.
+            PointData: The real world and image coordinates.
         """
         current_selected = str(self.current_selected_point[TRANSFORMATION_POINTS])
         key: str
@@ -309,11 +328,23 @@ class ConfiguratorHandler:
             current_selected, (int(image_x), int(image_y)), (real_x, real_y)
         )
 
-        return (int(image_x), int(image_y), float(real_x), float(real_y))
+        data = PointData(int(image_x), int(image_y), float(real_x), float(real_y))
+
+        return data
 
     def real_world_config_text_changed(
         self, is_image_coord: bool, coord_index: int, number: float
-    ) -> tuple[int, int, float, float]:
+    ) -> PointData:
+        """Changes the real world configuration.
+
+        Args:
+            is_image_coord (bool): If the changed text is image or real world coordinate.
+            coord_index (int): The index of the coordinate.
+            number (float): The new value of the coordinate.
+
+        Returns:
+            PointData: The real world and image coordinates.
+        """
         if is_image_coord:
             image_x, image_y = self.__last_tested[0], self.__last_tested[1]
             if coord_index == 0:
@@ -321,17 +352,17 @@ class ConfiguratorHandler:
             else:
                 image_y = int(number)
             real_x, real_y = self.get_real_world_point((image_x, image_y))
-            self.__last_tested = (image_x, image_y, real_x, real_y)
-            return (image_x, image_y, float(real_x), float(real_y))
-
-        real_x, real_y = self.__last_tested[2], self.__last_tested[3]
-        if coord_index == 0:
-            real_x = number
         else:
-            real_y = number
-        image_x, image_y = self.get_image_point((real_x, real_y))
-        self.__last_tested = (image_x, image_y, real_x, real_y)
-        return (int(image_x), int(image_y), float(real_x), float(real_y))
+            real_x, real_y = self.__last_tested[2], self.__last_tested[3]
+            if coord_index == 0:
+                real_x = number
+            else:
+                real_y = number
+            image_x, image_y = self.get_image_point((real_x, real_y))
+
+        data = PointData(int(image_x), int(image_y), float(real_x), float(real_y))
+        self.__last_tested = data
+        return data
 
     def roi_color_changed(self, input_id: str, text: str) -> tuple[int, int, int, int]:
         """Changes the ROI color.
@@ -416,7 +447,7 @@ class ConfiguratorHandler:
 
     def points_drawer_clicked(
         self, active_mode: str, clicked_point: tuple[int, int], video_size: tuple[int, int], full_size: tuple[int, int]
-    ) -> tuple[int, int, float, float]:
+    ) -> PointData:
         """Handles the click event on the points drawer.
 
         Args:
@@ -429,7 +460,7 @@ class ConfiguratorHandler:
             ValueError: If the active mode is invalid.
 
         Returns:
-            tuple[int, int, float, float]: The configured point data.
+            PointData: The configured point data.
         """
         image_coords = self.__calculate_real_point(clicked_point, video_size, full_size)
 
@@ -443,14 +474,14 @@ class ConfiguratorHandler:
 
         return configured_points
 
-    def __points_drawer_clicked_mode_roi(self, point_coords: tuple[int, int]) -> tuple[int, int, float, float]:
+    def __points_drawer_clicked_mode_roi(self, point_coords: tuple[int, int]) -> PointData:
         """Handles the click event on the points drawer in ROI mode.
 
         Args:
             point_coords (tuple[int, int]): The coordinates of the clicked point.
 
         Returns:
-            tuple[int, int, float, float]: The clicked point data.
+            PointData: The clicked point data.
         """
         real_x, real_y = self.get_real_world_point(point_coords)
 
@@ -459,9 +490,9 @@ class ConfiguratorHandler:
         if is_new:
             self.region_of_interest_points.append((0, 0))
             self.current_selected_point[REGION_OF_INTEREST] = current_index + 1
-            return_coords = (0, 0, 0.0, 0.0)
+            return_coords = PointData(0, 0, 0.0, 0.0)
         else:
-            return_coords = (int(point_coords[0]), int(point_coords[1]), float(real_x), float(real_y))
+            return_coords = PointData(int(point_coords[0]), int(point_coords[1]), float(real_x), float(real_y))
 
         self.region_of_interest_points[current_index] = point_coords
 
@@ -469,14 +500,14 @@ class ConfiguratorHandler:
 
     def __points_drawer_clicked_mode_transformation(
         self, point_coords: tuple[int, int]
-    ) -> tuple[int, int, float, float]:
+    ) -> PointData:
         """Handles the click event on the points drawer in transformation mode.
 
         Args:
             point_coords (tuple[int, int]): The coordinates of the clicked point.
 
         Returns:
-            tuple[int, int, float, float]: The clicked point data.
+            PointData: The clicked point data.
         """
         current_point = str(self.current_selected_point[TRANSFORMATION_POINTS])
         real_x, real_y = self.configured_transformation_points[current_point]["real_world"]
@@ -484,11 +515,13 @@ class ConfiguratorHandler:
         self.configured_transformation_points[current_point]["image"] = point_coords
         self.add_transformation_point(point_coords, (real_x, real_y), current_point)
 
-        return (int(point_coords[0]), int(point_coords[1]), float(real_x), float(real_y))
+        data = PointData(int(point_coords[0]), int(point_coords[1]), float(real_x), float(real_y))
+
+        return data
 
     def points_shower_clicked(
         self, clicked_point: tuple[int, int], video_size: tuple[int, int], full_size: tuple[int, int]
-    ) -> tuple[int, int, float, float]:
+    ) -> PointData:
         """Handles the click event on the points shower.
 
         Args:
@@ -497,16 +530,16 @@ class ConfiguratorHandler:
             full_size (tuple[int, int]): The size of the video with borders.
 
         Returns:
-            tuple[int, int, float, float]: The clicked point data.
+            PointData: The clicked point data.
         """
         image_x, image_y = self.__calculate_real_point(clicked_point, video_size, full_size)
         real_x, real_y = self.get_real_world_point((image_x, image_y))
 
-        self.__last_tested = (image_x, image_y, real_x, real_y)
+        data = PointData(int(image_x), int(image_y), float(real_x), float(real_y))
+        self.__last_tested = data
+        return data
 
-        return (int(image_x), int(image_y), float(real_x), float(real_y))
-
-    def arrow_button_clicked(self, config_name: str, direction: str) -> tuple[str, tuple[int, int, float, float]]:
+    def arrow_button_clicked(self, config_name: str, direction: str) -> tuple[str, PointData]:
         """Moves the currently selected point.
 
         Args:
@@ -517,7 +550,7 @@ class ConfiguratorHandler:
             ValueError: If the config name is invalid.
 
         Returns:
-            tuple[str, tuple[int, int, float, float]]: The new point data.
+            tuple[str, PointData]: The new point data.
         """
         match config_name:
             case "Region of Interest":
@@ -527,14 +560,14 @@ class ConfiguratorHandler:
             case _:
                 raise ValueError(f"Config name '{config_name}' is invalid.")
 
-    def __roi_arrow_button_clicked(self, direction: str) -> tuple[str, tuple[int, int, float, float]]:
+    def __roi_arrow_button_clicked(self, direction: str) -> tuple[str, PointData]:
         """Moves the currently selected ROI point.
 
         Args:
             direction (str): The direction of the clicked button.
 
         Returns:
-            tuple[str, tuple[int, int, float, float]]: The new point data.
+            tuple[str, PointData]: The new point data.
         """
         current_index = int(self.current_selected_point[REGION_OF_INTEREST])
         to_modulo_with = len(self.region_of_interest_points) + 1
@@ -549,19 +582,18 @@ class ConfiguratorHandler:
             image_coords = self.region_of_interest_points[int(self.current_selected_point[REGION_OF_INTEREST])]
             real_coords = self.get_real_world_point((image_coords[0], image_coords[1]))
 
-        return (
-            point_text,
-            (int(image_coords[0]), int(image_coords[1]), float(real_coords[0]), float(real_coords[1])),
-        )
+        data = PointData(int(image_coords[0]), int(image_coords[1]), float(real_coords[0]), float(real_coords[1]))
 
-    def __transformation_arrow_button_clicked(self, direction: str) -> tuple[str, tuple[int, int, float, float]]:
+        return (point_text, data)
+
+    def __transformation_arrow_button_clicked(self, direction: str) -> tuple[str, PointData]:
         """Moves the currently selected transformation point.
 
         Args:
             direction (str): The direction of the clicked button.
 
         Returns:
-            tuple[str, tuple[int, int, float, float]]: The new point data.
+            tuple[str, PointData]: The new point data.
         """
         current_index = self.__transformation_points.index(str(self.current_selected_point[TRANSFORMATION_POINTS]))
         next_index = (current_index + 1 if direction == "right" else current_index - 1) % 4
@@ -572,7 +604,6 @@ class ConfiguratorHandler:
         image_coords = (int(conf["image"][0]), int(conf["image"][1]))
         real_coords = conf["real_world"]
 
-        return (
-            next_name,
-            (int(image_coords[0]), int(image_coords[1]), float(real_coords[0]), float(real_coords[1])),
-        )
+        data = PointData(int(image_coords[0]), int(image_coords[1]), float(real_coords[0]), float(real_coords[1]))
+
+        return (next_name, data)
