@@ -4,6 +4,9 @@
 from pathlib import Path
 
 
+FILE_DIR = Path(__file__).parent
+
+
 class DirectoryNotFoundError(Exception):
     """Raised when the directory is not found.
     
@@ -16,14 +19,15 @@ class DirectoryNotFoundError(Exception):
         super().__init__(self.message)
 
 
-def find_base_directory() -> Path | DirectoryNotFoundError:
+def find_base_directory() -> tuple[Path, None | DirectoryNotFoundError]:
     """Find the base directory of the project. If not found exits the program.
 
     Returns:
-        Path: The base directory.
+        Path: The base directory or any empty path.
+        None | DirectoryNotFoundError: None if the directory is found, else a directory not found error.
     """
-    search_paths = {Path().cwd(), Path().cwd().parent, Path(__file__).parent.parent}
+    search_paths = {Path().cwd(), Path().cwd().parent, FILE_DIR.parent}
     for directory in search_paths:
         if (directory / "vehicle_tracking_configurator_config.json").exists():
-            return directory
-    return DirectoryNotFoundError("Base directory was not found.")
+            return (directory, None)
+    return (Path(), DirectoryNotFoundError("Base directory was not found."))
