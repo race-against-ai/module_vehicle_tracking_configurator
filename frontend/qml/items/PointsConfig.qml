@@ -180,7 +180,7 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    vehicle_tracking_configurator_model.arrow_button_clicked(chosenConfigText.text, "left");
+                    vehicle_tracking_configurator_model.arrow_button_clicked(configNameText.text, "left");
                 }
             }
         }
@@ -212,7 +212,7 @@ Rectangle {
                 anchors.fill: parent
 
                 onClicked: {
-                    vehicle_tracking_configurator_model.arrow_button_clicked(chosenConfigText.text, "right");
+                    vehicle_tracking_configurator_model.arrow_button_clicked(configNameText.text, "right");
                 }
             }
         }
