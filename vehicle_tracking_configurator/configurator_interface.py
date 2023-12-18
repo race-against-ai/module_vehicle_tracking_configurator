@@ -2,9 +2,7 @@
 # Copyright (C) 2023, NG:ITL
 
 from threading import Thread, Event
-from pathlib import Path
 from json import load
-import sys
 
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QGuiApplication, QImage
@@ -14,31 +12,50 @@ import pynng
 
 from vehicle_tracking_configurator.configurator_interface_model import ModelVehicleTrackingConfigurator
 from vehicle_tracking_configurator.configurator import ConfiguratorHandler
-from utils.shared_functions import find_base_directory, DirectoryNotFoundError
+from utils.shared_functions import find_base_directory
+
+
+BASE_DIR, error = find_base_directory()
+
+if error:
+    raise error
+del error
 
 
 class StreamImageProvider(QQuickImageProvider):
+    """A class for providing images to the UI.
+
+    Args:
+        width (int): The width of the image.
+        height (int): The height of the image.
+    """
+
     def __init__(self, width: int, height: int) -> None:
-        super(StreamImageProvider, self).__init__(QQuickImageProvider.Image)  # type: ignore[attr-defined]
+        super().__init__(QQuickImageProvider.Image)  # type: ignore[attr-defined]
         self.img = QImage(width, height, QImage.Format_RGB888)  # type: ignore[attr-defined]
 
-    def requestImage(self, id: str, size: QSize, requested_size: QSize) -> QImage:
+    def requestImage(self, frame_id: str, size: QSize, requested_size: QSize) -> QImage:
+        """Scales image to the requested size.
+
+        Args:
+            frame_id (str): The frame number.
+            size (QSize): The size of the image.
+            requested_size (QSize): The requested size of the image.
+
+        Returns:
+            QImage: The scaled image.
+        """
+        del frame_id, size
         if requested_size.width() > 0 and requested_size.height() > 0:
             return self.img.scaled(requested_size, Qt.KeepAspectRatio)  # type: ignore[attr-defined]
-        else:
-            return self.img
+        return self.img
 
 
 class ConfiguratorInterface:
     """A class for starting the QT application."""
 
     def __init__(self) -> None:
-        base_dir = find_base_directory()
-
-        if isinstance(base_dir, DirectoryNotFoundError):
-            raise base_dir
-
-        with open(base_dir / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
+        with open(BASE_DIR / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
             conf = load(config_file)
             self.__recv_frames_address = conf["pynng"]["subscribers"]["camera_frame_receiver"]["address"]
 
@@ -62,15 +79,15 @@ class ConfiguratorInterface:
             "vehicle_tracking_configurator_model", self.__vehicle_tracking_configurator_model
         )
 
-        self.__engine.load(str(base_dir / "frontend/qml/main.qml"))
+        self.__engine.load(str(BASE_DIR / "frontend/qml/main.qml"))
 
         self.image_count = 0
 
         self.__stop_thread_event = Event()
-        self.__send_next_images_thread = Thread(target=self.__send_next_images_worker)
+        self.__send_next_images_thread = Thread(target=self.__transmit_images_from_backend_to_frontend_worker)
         self.__send_next_images_thread.start()
 
-    def __send_next_images_worker(self) -> None:
+    def __transmit_images_from_backend_to_frontend_worker(self) -> None:
         """A function that constantly sends new images to the UI."""
         while not self.__stop_thread_event.is_set():
             drawer_frame = self.__configuration_handler.read_drawer_frame()
