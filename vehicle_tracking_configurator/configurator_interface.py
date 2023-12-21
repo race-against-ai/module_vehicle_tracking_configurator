@@ -2,6 +2,7 @@
 # Copyright (C) 2023, NG:ITL
 
 from threading import Thread, Event
+from pathlib import Path
 from json import load
 
 from PySide6.QtCore import Qt, QSize
@@ -13,14 +14,10 @@ import pynng
 
 from vehicle_tracking_configurator.configurator_interface_model import ModelVehicleTrackingConfigurator
 from vehicle_tracking_configurator.configurator import ConfiguratorHandler
-from utils.shared_functions import find_base_directory, get_all_schemas
+from utils.shared_functions import get_all_schemas
 
 
-BASE_DIR, error = find_base_directory()
-
-if error:
-    raise error
-del error
+BASE_DIR = Path(__file__).parent.parent
 
 
 class StreamImageProvider(QQuickImageProvider):
@@ -58,7 +55,7 @@ class ConfiguratorInterface:
     def __init__(self) -> None:
         self.__schemas = get_all_schemas()
 
-        with open(BASE_DIR / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
+        with open("./vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
             conf = load(config_file)
             validate(instance=conf, schema=self.__schemas["configurator_config"])
             self.__recv_frames_address = conf["pynng"]["subscribers"]["camera_frame_receiver"]["address"]
@@ -83,7 +80,7 @@ class ConfiguratorInterface:
             "vehicle_tracking_configurator_model", self.__vehicle_tracking_configurator_model
         )
 
-        self.__engine.load(str(BASE_DIR / "frontend/qml/main.qml"))
+        self.__engine.load(BASE_DIR / "frontend/qml/main.qml")
 
         self.image_count = 0
 

@@ -3,6 +3,7 @@
 
 from json import load, loads, dumps
 from typing import NamedTuple
+from pathlib import Path
 
 from jsonschema.exceptions import ValidationError
 from jsonschema import validate
@@ -12,17 +13,11 @@ import numpy as np
 import cv2
 
 from vehicle_tracking_configurator.topview_transformation import TopviewTransformation
-from utils.shared_functions import find_base_directory, get_all_schemas
+from utils.shared_functions import get_all_schemas
 
 
-BASE_DIR, error = find_base_directory()
-SCHEMA_DIR = BASE_DIR / "vehicle_tracking_configurator" / "schema"
 REGION_OF_INTEREST = "Region of Interest"
 TRANSFORMATION_POINTS = "Transformation Points"
-
-if error:
-    raise error
-del error
 
 
 class PointData(NamedTuple):
@@ -52,9 +47,7 @@ class ConfiguratorHandler:
 
         self.__schemas = get_all_schemas()
 
-        with open(
-            BASE_DIR / "vehicle_tracking_configurator_config.json", "r", encoding="utf-8"
-        ) as config_file:
+        with open("./vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
             conf = load(config_file)
             validate(conf, self.__schemas["configurator_config"])
             pynng_config = conf["pynng"]
@@ -212,9 +205,7 @@ class ConfiguratorHandler:
         self.__reset_transformation_points()
         for point_name, point in config_tracker[TRANSFORMATION_POINTS].items():
             self.add_transformation_point(
-                (point["image"][0], point["image"][1]),
-                (point["real_world"][0], point["real_world"][1]),
-                point_name
+                (point["image"][0], point["image"][1]), (point["real_world"][0], point["real_world"][1]), point_name
             )
         self.__tracker_config_handler.send(b"OK NONE")
 
@@ -257,9 +248,7 @@ class ConfiguratorHandler:
         """
         return self.__topview_transformation.world_to_image_transform(point)
 
-    def roi_config_text_changed(
-        self, is_image_coord: bool, coord_index: int, number: float
-    ) -> PointData:
+    def roi_config_text_changed(self, is_image_coord: bool, coord_index: int, number: float) -> PointData:
         """Changes the ROI configuration.
 
         Args:
@@ -299,9 +288,7 @@ class ConfiguratorHandler:
 
         return data
 
-    def transformation_config_text_changed(
-        self, is_image_coord: bool, coord_index: int, number: float
-    ) -> PointData:
+    def transformation_config_text_changed(self, is_image_coord: bool, coord_index: int, number: float) -> PointData:
         """Changes the transformation configuration.
 
         Args:
@@ -333,9 +320,7 @@ class ConfiguratorHandler:
 
         return data
 
-    def real_world_config_text_changed(
-        self, is_image_coord: bool, coord_index: int, number: float
-    ) -> PointData:
+    def real_world_config_text_changed(self, is_image_coord: bool, coord_index: int, number: float) -> PointData:
         """Changes the real world configuration.
 
         Args:
@@ -499,9 +484,7 @@ class ConfiguratorHandler:
 
         return return_coords
 
-    def __points_drawer_clicked_mode_transformation(
-        self, point_coords: tuple[int, int]
-    ) -> PointData:
+    def __points_drawer_clicked_mode_transformation(self, point_coords: tuple[int, int]) -> PointData:
         """Handles the click event on the points drawer in transformation mode.
 
         Args:
