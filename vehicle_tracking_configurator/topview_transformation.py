@@ -22,12 +22,12 @@ class TopviewTransformation:
             "bottom_right": (0, 0),
         }
         self.__image_to_world_matrix = cv2.getPerspectiveTransform(
-            np.array(list(self.__image_points.values()), dtype=np.float32),
-            np.array(list(self.__world_points.values()), dtype=np.float32),
+            np.array(list(self.__image_points.values()), dtype=np.float32),  # type: ignore[arg-type]
+            np.array(list(self.__world_points.values()), dtype=np.float32),  # type: ignore[arg-type]
         )
         self.__world_to_image_matrix = cv2.getPerspectiveTransform(
-            np.array(list(self.__world_points.values()), dtype=np.float32),
-            np.array(list(self.__image_points.values()), dtype=np.float32),
+            np.array(list(self.__world_points.values()), dtype=np.float32),  # type: ignore[arg-type]
+            np.array(list(self.__image_points.values()), dtype=np.float32),  # type: ignore[arg-type]
         )
 
     def set_transformation_point(
@@ -45,10 +45,10 @@ class TopviewTransformation:
         image_points = list(self.__image_points.values())
         world_points = list(self.__world_points.values())
         self.__image_to_world_matrix = cv2.getPerspectiveTransform(
-            np.array(image_points, dtype=np.float32), np.array(world_points, dtype=np.float32)
+            np.array(image_points, dtype=np.float32), np.array(world_points, dtype=np.float32)  # type: ignore[arg-type]
         )
         self.__world_to_image_matrix = cv2.getPerspectiveTransform(
-            np.array(world_points, dtype=np.float32), np.array(image_points, dtype=np.float32)
+            np.array(world_points, dtype=np.float32), np.array(image_points, dtype=np.float32)  # type: ignore[arg-type]
         )
 
     def image_to_world_transform(self, point: tuple[int, int]) -> tuple[float, float]:
@@ -60,7 +60,7 @@ class TopviewTransformation:
         Returns:
             tuple[float, float]: The world point.
         """
-        points = cv2.perspectiveTransform(np.array([[point]], dtype=np.float32), self.__image_to_world_matrix)[0][0]
+        points = cv2.perspectiveTransform(np.array([[point]], dtype=np.float32), self.__image_to_world_matrix)[0][0]  # type: ignore[arg-type]
         return (round(float(points[0]), 3), round(float(points[1]), 3))
 
     def world_to_image_transform(self, point: tuple[float, float]) -> tuple[int, int]:
@@ -72,5 +72,5 @@ class TopviewTransformation:
         Returns:
             tuple[int, int]: The image point.
         """
-        points = cv2.perspectiveTransform(np.array([[point]], dtype=np.float32), self.__world_to_image_matrix)[0][0]
+        points = cv2.perspectiveTransform(np.array([[point]], dtype=np.float32), self.__world_to_image_matrix)[0][0]  # type: ignore[arg-type]
         return (int(points[0]), int(points[1]))
