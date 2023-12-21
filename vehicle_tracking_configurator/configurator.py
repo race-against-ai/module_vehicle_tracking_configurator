@@ -13,7 +13,7 @@ import numpy as np
 import cv2
 
 from vehicle_tracking_configurator.topview_transformation import TopviewTransformation
-from utils.shared_functions import get_all_schemas
+from vehicle_tracking_configurator.utils.shared_functions import get_all_schemas
 
 
 REGION_OF_INTEREST = "Region of Interest"

@@ -7,10 +7,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[
-        ('frontend', 'frontend'),
-        ('schema', 'schema')
-    ],
+    datas=[],
     hiddenimports=['_cffi_backend'],
     hookspath=[],
     hooksconfig={},

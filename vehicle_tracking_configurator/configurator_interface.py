@@ -14,7 +14,7 @@ import pynng
 
 from vehicle_tracking_configurator.configurator_interface_model import ModelVehicleTrackingConfigurator
 from vehicle_tracking_configurator.configurator import ConfiguratorHandler
-from utils.shared_functions import get_all_schemas
+from vehicle_tracking_configurator.utils.shared_functions import get_all_schemas
 
 
 BASE_DIR = Path(__file__).parent.parent

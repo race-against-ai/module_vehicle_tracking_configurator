@@ -2,12 +2,13 @@
 # Copyright (C) 2023, NG:ITL
 
 from pathlib import Path
+from time import sleep
 from json import load
 
 from typing import Any
 
 
-MAIN_DIR = Path(__file__).parent.parent
+VEHICLE_TRACKING_DIR = Path(__file__).parent.parent
 
 
 class DirectoryNotFoundError(Exception):
@@ -28,9 +29,12 @@ def get_all_schemas() -> dict[str, dict[str, Any]]:
     Returns:
         list[Path]: A list of all the schemas.
     """
+    print(VEHICLE_TRACKING_DIR)
     schemas: dict[str, dict[str, Any]] = {}
-    for schema in (MAIN_DIR / "schema").glob("*.json"):
+    for schema in (VEHICLE_TRACKING_DIR / "schema").glob("*.json"):
         with open(schema, "r", encoding="utf-8") as schema_file:
             schema_name = schema.stem
             schemas[schema_name] = load(schema_file)
+    while True:
+        sleep(10)
     return schemas
