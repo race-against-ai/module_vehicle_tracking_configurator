@@ -21,4 +21,5 @@ setup(
     packages=find_packages(),
     long_description=read("README.md"),
     install_requires=["pynng~=0.7.2", "PySide6==6.5.3", "opencv-python~=4.8.1.78", "webdav4~=0.9.8"],
+    include_package_data=True
 )
