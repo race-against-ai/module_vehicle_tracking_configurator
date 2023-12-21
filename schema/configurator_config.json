@@ -1,0 +1,47 @@
+{
+    "type": "object",
+    "properties": {
+        "pynng": {
+            "type": "object",
+            "properties": {
+                "publishers": {
+                    "type": "object",
+                    "properties": {
+                    }
+                },
+                "subscribers": {
+                    "type": "object",
+                    "properties": {
+                        "camera_frame_receiver": {"$ref": "#/$defs/address_without_topic"},
+                        "tracker_config": {"$ref": "#/$defs/address_without_topic"}
+                    },
+                    "required": ["camera_frame_receiver", "tracker_config"]
+                }
+            },
+            "required": ["publishers", "subscribers"]
+        },
+        "resource_downloader": {
+            "type": "object",
+            "properties": {
+                "url": {"type": "string"},
+                "client_name": {"type": "string"},
+                "client_password": {"type": "string"}
+            },
+            "required": ["url", "client_name", "client_password"]
+        }
+    },
+    "required": ["pynng", "resource_downloader"],
+    "$defs": {
+        "address_without_topic": {
+            "type": "object",
+            "properties": {
+                "address": {"type": "string"},
+                "topics": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
+            "required": ["address"]
+        }
+    }
+}
