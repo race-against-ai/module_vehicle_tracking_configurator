@@ -29,8 +29,8 @@ Window {
     height: 1080
     minimumWidth: 1536
     minimumHeight: 864
-    maximumWidth: 1536
-    maximumHeight: 864
+    maximumWidth: 1920
+    maximumHeight: 1080
 
     color: backgroundColor
     visible: true
@@ -48,6 +48,22 @@ Window {
             } else if (event.key == Qt.Key_Right) {
                 vehicle_tracking_configurator_model.arrow_button_clicked("button", "right");
                 event.accepted = true;
+            } else if (event.key == Qt.Key_F11) {
+                if (window.visibility == Window.FullScreen) {
+                    window.visibility = Window.Windowed;
+                }
+                else if (window.visibility == Window.Windowed) {
+                    window.visibility = Window.FullScreen;
+                    if (window.width > window.maximumWidth || window.height > window.maximumHeight) {
+                        window.visibility = Window.Windowed;
+                        window.width = window.maximumWidth;
+                        window.height = window.maximumHeight;
+                    } else if (window.width < window.minimumWidth || window.height < window.minimumHeight) {
+                        window.visibility = Window.Windowed;
+                        window.width = window.minimumWidth;
+                        window.height = window.minimumHeight;
+                    }
+                }
             }
         }
 
