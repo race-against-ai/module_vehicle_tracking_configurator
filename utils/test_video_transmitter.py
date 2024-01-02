@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Transmits a video file over IPC to the RAAI camera frame subscriber.""" ""
 # Copyright (C) 2023, NG:ITL
 
