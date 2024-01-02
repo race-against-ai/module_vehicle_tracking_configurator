@@ -13,11 +13,11 @@ import numpy as np
 import cv2
 
 from vehicle_tracking_configurator.topview_transformation import TopviewTransformation
-from vehicle_tracking_configurator.utils.shared_functions import get_all_schemas
 
 
 REGION_OF_INTEREST = "Region of Interest"
 TRANSFORMATION_POINTS = "Transformation Points"
+FILE_PATH = Path(__file__).parent
 
 
 class PointData(NamedTuple):
@@ -44,8 +44,11 @@ class ConfiguratorHandler:
 
     def __init__(self) -> None:
         self.__schemas: dict[str, dict] = {}
+        schemas = ["configurator_config", "tracker_config"]
 
-        self.__schemas = get_all_schemas()
+        for name in schemas:
+            with open(FILE_PATH / f"schema/{name}.json", "r", encoding="utf-8") as schema_file:
+                self.__schemas[name] = load(schema_file)
 
         with open("./vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
             conf = load(config_file)
