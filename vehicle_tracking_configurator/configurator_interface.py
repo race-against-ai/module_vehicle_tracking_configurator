@@ -3,7 +3,7 @@
 
 from threading import Thread, Event
 from pathlib import Path
-from json import load
+from json import load, dump
 
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QGuiApplication, QImage
@@ -18,6 +18,7 @@ from vehicle_tracking_configurator.configurator import ConfiguratorHandler
 
 FILE_DIR = Path(__file__).parent
 BASE_DIR = FILE_DIR.parent
+CONFIG_FILE_PATH = BASE_DIR / "vehicle_tracking_configurator_config.json"
 
 
 class StreamImageProvider(QQuickImageProvider):
@@ -56,6 +57,10 @@ class ConfiguratorInterface:
         config_schema: dict = {}
         with open(FILE_DIR / "schema/configurator_config.json", "r", encoding="utf-8") as schema_file:
             config_schema = load(schema_file)
+
+        if not CONFIG_FILE_PATH.exists():
+            with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as config_file, open(FILE_DIR / "templates/configurator_config.json", "r", encoding="utf-8") as template_file:
+                dump(load(template_file), config_file, indent=4)
 
         with open("./vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
             conf = load(config_file)
