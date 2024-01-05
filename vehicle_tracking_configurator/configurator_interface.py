@@ -59,7 +59,9 @@ class ConfiguratorInterface:
             config_schema = load(schema_file)
 
         if not CONFIG_FILE_PATH.exists():
-            with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as config_file, open(FILE_DIR / "templates/configurator_config.json", "r", encoding="utf-8") as template_file:
+            with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as config_file, open(
+                FILE_DIR / "templates/configurator_config.json", "r", encoding="utf-8"
+            ) as template_file:
                 dump(load(template_file), config_file, indent=4)
 
         with open("./vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:

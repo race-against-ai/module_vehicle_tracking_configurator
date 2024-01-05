@@ -20,6 +20,13 @@ setup(
     url="https://github.com/vw-wob-it-edu-ngitl/raai_module_vehicle_tracking_configurator",
     packages=find_packages(),
     long_description=read("README.md"),
-    install_requires=["pynng~=0.7.2", "PySide6==6.5.3", "opencv-python~=4.8.1.78", "webdav4~=0.9.8", "pillow~=10.1.0", "jsonschema~=4.20.0"],
+    install_requires=[
+        "pynng~=0.7.2",
+        "PySide6==6.5.3",
+        "opencv-python~=4.8.1.78",
+        "webdav4~=0.9.8",
+        "pillow~=10.1.0",
+        "jsonschema~=4.20.0",
+    ],
     include_package_data=True,
 )
