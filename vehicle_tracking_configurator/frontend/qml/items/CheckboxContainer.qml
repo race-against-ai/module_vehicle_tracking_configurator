@@ -16,6 +16,7 @@ Item {
     }
 
     Row {
+        id: modeContainerRow
 
         Item {
             id: regionOfInterestCheckbox

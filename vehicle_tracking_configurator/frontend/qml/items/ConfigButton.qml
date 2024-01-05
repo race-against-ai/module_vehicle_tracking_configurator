@@ -7,7 +7,6 @@ Rectangle {
 
     anchors.verticalCenter: parent.verticalCenter
     anchors.top: parent.top
-    anchors.topMargin: 5
 
     width: parent.width / 3
     height: parent.height / 2
@@ -32,10 +31,14 @@ Rectangle {
 
     Text {
         id: buttonText
-        color: window.buttonTextColor
-        font.pixelSize: 30
 
-        anchors.centerIn: parent
+        color: window.buttonTextColor
+        font.pixelSize: 5000
+        minimumPixelSize: 10
+        fontSizeMode: Text.Fit
+
+        anchors.fill: parent
         horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
     }
 }

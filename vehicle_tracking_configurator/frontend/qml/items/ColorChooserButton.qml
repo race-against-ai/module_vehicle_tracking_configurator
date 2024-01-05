@@ -26,11 +26,16 @@ Rectangle {
     Text {
         id: buttonTextContainer
 
-        text: buttonText
-        color: window.buttonTextColor
-        font.pixelSize: 20
+        width: parent.width
+        height: parent.height
 
-        anchors.centerIn: parent
+        font.pointSize: 200
+        minimumPointSize: 1
+        fontSizeMode: Text.Fit
+
+        color: window.buttonTextColor
+
         horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
     }
 }

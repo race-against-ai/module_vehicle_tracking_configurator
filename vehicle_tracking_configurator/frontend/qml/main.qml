@@ -22,23 +22,31 @@ Window {
     property color accentColor: "#162424"
     property color accentColor2: "#e53170"
     property int videosX: window.width * 0.37109375
-    property int videosY: window.height * 0.490740
-    property real targetAspectRatio: 16 / 9
+    property int videosY: window.height * 0.490740 + 3.75
+    property real targetAspectRatio: 9 / 16
 
-    width: 1920
-    height: 1080
+    width: 1536
+    height: 864
     minimumWidth: 1536
     minimumHeight: 864
-    maximumWidth: 1920
-    maximumHeight: 1080
 
     color: backgroundColor
     visible: true
 
     title: "Configurator Interface"
 
+    onVisibilityChanged: {
+        if (window.visibility == Window.Maximized) {
+            window.visibility = Window.FullScreen;
+        }
+    }
+
     Item {
-        anchors.fill: parent
+        id: baseContainer
+
+        implicitWidth: window.width
+        implicitHeight: window.width * targetAspectRatio
+
         focus: true
 
         Keys.onPressed: (event) => {
@@ -51,18 +59,8 @@ Window {
             } else if (event.key == Qt.Key_F11) {
                 if (window.visibility == Window.FullScreen) {
                     window.visibility = Window.Windowed;
-                }
-                else if (window.visibility == Window.Windowed) {
+                } else {
                     window.visibility = Window.FullScreen;
-                    if (window.width > window.maximumWidth || window.height > window.maximumHeight) {
-                        window.visibility = Window.Windowed;
-                        window.width = window.maximumWidth;
-                        window.height = window.maximumHeight;
-                    } else if (window.width < window.minimumWidth || window.height < window.minimumHeight) {
-                        window.visibility = Window.Windowed;
-                        window.width = window.minimumWidth;
-                        window.height = window.minimumHeight;
-                    }
                 }
             }
         }
@@ -116,28 +114,34 @@ Window {
 
             Item {
                 id: fullscreenButtonContainer
+
                 anchors.fill: parent
 
                 Rectangle {
                     id: fullscreenButtonBackground
+
                     x: fullscreenButton.x
                     y: fullscreenButton.y
+
+                    height: fullscreenButton.height
+                    width: fullscreenButton.width
+
                     color: "white"
                     opacity: 0.5
                     visible: fullScreenButtonMouseArea.containsMouse ? true : false
                     radius: 5
-                    height: fullscreenButton.height
-                    width: fullscreenButton.width
                 }
 
                 Svg {
                     id: fullscreenButton
+
                     source: "../assets/svg/maximize.svg"
+
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
+
                     height: parent.height * 0.1
                     fillMode: Image.PreserveAspectFit
-
 
                     MouseArea {
                         id: fullScreenButtonMouseArea
@@ -230,14 +234,19 @@ Window {
 
                 ScrollBar.vertical: ScrollBar {
                     id: vertScrollBar
-                    policy: ScrollBar.AsNeeded
-                    size: 15
+
                     interactive: true
+                    policy: ScrollBar.AsNeeded
                 }
 
                 Column {
                     id: column
-                    width: parent.width - vertScrollBar.width
+
+                    width: parent.width - 23
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+
                     spacing: 5
 
                     CheckboxContainer {
@@ -267,16 +276,18 @@ Window {
                     PointsConfig {
                         id: transformationPoints
 
-                        height: optionsRectangle.confBoxSizeY
                         width: parent.width
+                        height: optionsRectangle.confBoxSizeY
 
                         configName: "Transformation Points"
                         chosenPointDefaultText: "top_left"
 
                         Rectangle {
                             id: transformationPointsCover
-                            visible: true
+
                             anchors.fill: parent
+
+                            visible: true
                             color: "black"
                             opacity: 0.5
                         }
@@ -294,7 +305,7 @@ Window {
                             anchors.top: parent.top
 
                             height: parent.height
-                            width: parent.width / 10 * 6
+                            width: parent.width * 0.6
 
                             configName: "Real World Coordinate Points"
                         }
@@ -306,7 +317,7 @@ Window {
                             anchors.leftMargin: 5
                             anchors.top: parent.top
 
-                            width: parent.width / 10 * 4
+                            width: parent.width * 0.4
                             height: optionsRectangle.confBoxSizeY
 
                             color: window.accentColor
@@ -380,7 +391,7 @@ Window {
                                 anchors.leftMargin: 5
 
                                 width: parent.width / 3 - 10
-                                height: 40
+                                height: parent.height * 0.1593
 
                                 buttonText: "Gray"
                             }
@@ -394,7 +405,7 @@ Window {
                                 anchors.leftMargin: 5
 
                                 width: parent.width / 3 - 10
-                                height: 40
+                                height: parent.height * 0.1593
 
                                 buttonText: "Black"
                             }
@@ -408,7 +419,7 @@ Window {
                                 anchors.leftMargin: 5
 
                                 width: parent.width / 3 - 10
-                                height: 40
+                                height: parent.height * 0.1593
 
                                 buttonText: "White"
                             }
@@ -420,7 +431,7 @@ Window {
                         id: configButtonContainer
 
                         width: parent.width
-                        height: parent.height / 5 / 2 + 5
+                        height: parent.height / 10 + 5
 
                         color: "transparent"
 
@@ -428,14 +439,14 @@ Window {
                             id: receiveConfig
                             buttonText: "Receive Config"
                             anchors.left: parent.left
-                            anchors.leftMargin: 25
+                            anchors.leftMargin: parent.width / 4 - width / 2
                         }
 
                         ConfigButton {
                             id: sendConfig
                             buttonText: "Transmit Config"
                             anchors.right: parent.right
-                            anchors.rightMargin: 25
+                            anchors.rightMargin: parent.width / 4 - width / 2
                         }
                     }
                 }

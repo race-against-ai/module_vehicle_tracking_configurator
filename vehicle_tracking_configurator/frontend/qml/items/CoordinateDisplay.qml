@@ -6,6 +6,8 @@ Rectangle {
     id: pointsConfig
 
     property alias configName: configNameText.text
+    property int textBoxWidth: width * 0.17
+    property int textBoxHeight: height * 0.1594
 
     color: window.accentColor
 
@@ -24,10 +26,13 @@ Rectangle {
         anchors.left: pointsConfig.left
         anchors.leftMargin: 5
 
+        width: parent.width
+        height: parent.height * 0.2151
+
         color: window.headlineColor
         fontSizeMode: Text.Fit
         minimumPixelSize: 10
-        font.pixelSize: 40
+        font.pixelSize: 5000
     }
 
     Text {
@@ -40,10 +45,13 @@ Rectangle {
         anchors.left: pointsConfig.left
         anchors.leftMargin: 5
 
+        width: parent.width
+        height: parent.height * 0.1594
+
         color: window.headlineColor
         fontSizeMode: Text.Fit
         minimumPixelSize: 10
-        font.pixelSize: 30
+        font.pixelSize: 5000
     }
 
     CoordinateTextField {
@@ -51,6 +59,9 @@ Rectangle {
 
         assingedId: "imagePointXInput"
         placeholderText: "X"
+
+        height: textBoxHeight
+        width: textBoxWidth
 
         anchors.top: imageCoordsText.bottom
         anchors.left: parent.left
@@ -61,6 +72,9 @@ Rectangle {
 
         assingedId: "imagePointYInput"
         placeholderText: "Y"
+
+        height: textBoxHeight
+        width: textBoxWidth
 
         anchors.top: imageCoordsText.bottom
         anchors.left: imagePointXInput.right
@@ -76,10 +90,13 @@ Rectangle {
         anchors.left: pointsConfig.left
         anchors.leftMargin: 5
 
+        width: parent.width
+        height: parent.height * 0.1594
+
         color: window.headlineColor
         fontSizeMode: Text.Fit
         minimumPixelSize: 10
-        font.pixelSize: 30
+        font.pixelSize: 5000
     }
 
     CoordinateTextField {
@@ -87,6 +104,9 @@ Rectangle {
 
         assingedId: "realPointXInput"
         placeholderText: "X"
+
+        height: textBoxHeight
+        width: textBoxWidth
 
         anchors.top: realCoordsText.bottom
         anchors.left: pointsConfig.left
@@ -97,6 +117,9 @@ Rectangle {
 
         assingedId: "realPointYInput"
         placeholderText: "Y"
+
+        height: textBoxHeight
+        width: textBoxWidth
 
         anchors.top: realCoordsText.bottom
         anchors.left: realPointXInput.right

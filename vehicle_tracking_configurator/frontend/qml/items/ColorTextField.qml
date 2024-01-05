@@ -12,7 +12,11 @@ Rectangle {
 
     color: "transparent"
 
-    height: 80
+    height: parent.height / 3.5
+
+    function yes() {
+        console.log(colorTextContainer.parent.height / colorTextContainer.height)
+    }
 
     Text {
         id: colorText
@@ -24,7 +28,7 @@ Rectangle {
         height: parent.height / 2
         width: parent.width
 
-        font.pixelSize: 25
+        font.pixelSize: height - 10
         color: window.headlineColor
     }
 
@@ -34,18 +38,18 @@ Rectangle {
         height: parent.height / 2
         width: parent.width
 
-        anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: colorText.bottom
         anchors.topMargin: 5
         horizontalAlignment: Text.AlignHCenter
 
-        font.pixelSize: 25
+        font.pixelSize: height - 10
         color: window.headlineColor
 
         validator: IntValidator { bottom: 0; top: 255 }
 
         onTextEdited: {
             vehicle_tracking_configurator_model.color_text_changed(colorText.text, colorTextField.text);
+            colorTextContainer.yes()
         }
 
         background: Rectangle {
