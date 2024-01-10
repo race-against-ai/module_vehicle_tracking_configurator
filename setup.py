@@ -9,7 +9,7 @@ def read(fname):
 
 
 setup(
-    name="raai_module_template",
+    name="raai_module_vehicle_tracking_configurator",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     author="NGITl",
