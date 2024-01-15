@@ -18,7 +18,7 @@ from vehicle_tracking_configurator.configurator import ConfiguratorHandler
 
 FILE_DIR = Path(__file__).parent
 BASE_DIR = FILE_DIR.parent
-CONFIG_FILE_PATH = BASE_DIR / "vehicle_tracking_configurator_config.json"
+CONFIG_FILE_PATH = "./vehicle_tracking_configurator_config.json"
 
 
 class StreamImageProvider(QQuickImageProvider):
@@ -55,16 +55,16 @@ class ConfiguratorInterface:
 
     def __init__(self) -> None:
         config_schema: dict = {}
-        with open(FILE_DIR / "schema/configurator_config.json", "r", encoding="utf-8") as schema_file:
+        with open(FILE_DIR / "schemas/configurator_config.json", "r", encoding="utf-8") as schema_file:
             config_schema = load(schema_file)
 
-        if not CONFIG_FILE_PATH.exists():
-            with open(CONFIG_FILE_PATH, "w", encoding="utf-8") as config_file, open(
+        if not Path(CONFIG_FILE_PATH).exists():
+            with open(CONFIG_FILE_PATH, "x", encoding="utf-8") as config_file, open(
                 FILE_DIR / "templates/configurator_config.json", "r", encoding="utf-8"
             ) as template_file:
                 dump(load(template_file), config_file, indent=4)
 
-        with open("./vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
+        with open(CONFIG_FILE_PATH, "r", encoding="utf-8") as config_file:
             conf = load(config_file)
             validate(instance=conf, schema=config_schema)
             self.__recv_frames_address = conf["pynng"]["subscribers"]["camera_frame_receiver"]["address"]

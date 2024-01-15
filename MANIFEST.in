@@ -1,4 +1,4 @@
-include vehicle_tracking_configurator/schema/*.json
+include vehicle_tracking_configurator/schemas/*.json
 include vehicle_tracking_configurator/frontend/qml/*.qml
 include vehicle_tracking_configurator/frontend/qml/items/*.qml
 include vehicle_tracking_configurator/frontend/assets/svg/*.svg

@@ -47,7 +47,7 @@ class ConfiguratorHandler:
         schemas = ["configurator_config", "tracker_config"]
 
         for name in schemas:
-            with open(FILE_PATH / f"schema/{name}.json", "r", encoding="utf-8") as schema_file:
+            with open(FILE_PATH / f"schemas/{name}.json", "r", encoding="utf-8") as schema_file:
                 self.__schemas[name] = load(schema_file)
 
         with open("./vehicle_tracking_configurator_config.json", "r", encoding="utf-8") as config_file:
