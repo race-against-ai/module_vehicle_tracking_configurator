@@ -18,6 +18,8 @@ from vehicle_tracking_configurator.topview_transformation import TopviewTransfor
 REGION_OF_INTEREST = "Region of Interest"
 TRANSFORMATION_POINTS = "Transformation Points"
 FILE_PATH = Path(__file__).parent
+VIDEO_SIZE = (1332, 990)
+REAL_WORLD_SIZE = (7.5, 5.0)
 
 
 class PointData(NamedTuple):
@@ -39,12 +41,9 @@ class PointData(NamedTuple):
 class ConfiguratorHandler:
     """Handles the backend of the configurator."""
 
-    __VIDEO_SIZE = (1332, 990)
-    __REAL_WORLD_SIZE = (7.5, 5.0)
-
     def __init__(self) -> None:
         self.__schemas: dict[str, dict] = {}
-        schemas = ["configurator_config", "tracker_config"]
+        schemas = ["configurator_config", "response"]
 
         for name in schemas:
             with open(FILE_PATH / f"schemas/{name}.json", "r", encoding="utf-8") as schema_file:
@@ -73,10 +72,10 @@ class ConfiguratorHandler:
         self.__reset_transformation_points()
         self.__topview_transformation = TopviewTransformation()
 
-        self.roi_color: tuple[int, int, int, int] = (0, 0, 0, 255)
+        self.__roi_color: tuple[int, int, int, int] = (0, 0, 0, 255)
         self.__current_frame: np.ndarray
 
-    def __calculate_real_point(
+    def __calculate_actual_point_on_video(
         self, clicked_point: tuple[int, int], video_size: tuple[int, int], full_size: tuple[int, int]
     ) -> tuple[int, int]:
         """Calculates the real image point of different sized videos.
@@ -92,19 +91,20 @@ class ConfiguratorHandler:
         width_border_subtract = (full_size[0] - video_size[0]) // 2
         height_border_subtract = (full_size[1] - video_size[1]) // 2
 
-        width_factor = self.__VIDEO_SIZE[0] / video_size[0]
-        height_factor = self.__VIDEO_SIZE[1] / video_size[1]
+        width_factor = VIDEO_SIZE[0] / video_size[0]
+        height_factor = VIDEO_SIZE[1] / video_size[1]
 
         x, y = clicked_point[0] - width_border_subtract, clicked_point[1] - height_border_subtract
 
         image_x, image_y = int((x * width_factor)), int((y * height_factor))
 
-        image_x = int(np.clip(image_x, 0, self.__VIDEO_SIZE[0]))
-        image_y = int(np.clip(image_y, 0, self.__VIDEO_SIZE[1]))
+        image_x = int(np.clip(image_x, 0, VIDEO_SIZE[0]))
+        image_y = int(np.clip(image_y, 0, VIDEO_SIZE[1]))
 
         return image_x, image_y
 
     def __reset_transformation_points(self) -> None:
+        """Resets the transformation points to the default values."""
         self.configured_transformation_points: dict[str, dict[str, tuple[float, float] | tuple[int, int]]] = {
             "top_left": {"real_world": (0, 0), "image": (0, 0)},
             "top_right": {"real_world": (0, 0), "image": (0, 0)},
@@ -118,10 +118,8 @@ class ConfiguratorHandler:
         Returns:
             bytes: The drawer frame with the points drawn on it.
         """
-        frame_bytes: bytearray = self.__camera_frame_receiver.recv()
-        self.__current_frame = np.frombuffer(frame_bytes, dtype=np.uint8).reshape(
-            self.__VIDEO_SIZE[1], self.__VIDEO_SIZE[0], 3
-        )
+        frame_bytes: bytes = self.__camera_frame_receiver.recv()
+        self.__current_frame = np.frombuffer(frame_bytes, dtype=np.uint8).reshape(VIDEO_SIZE[1], VIDEO_SIZE[0], 3)
         frame = self.__current_frame.copy()
         if len(self.region_of_interest_points) > 0:
             frame = cv2.polylines(frame, [np.array(self.region_of_interest_points)], True, (255, 255, 255), 2)
@@ -172,7 +170,7 @@ class ConfiguratorHandler:
         frame = self.__current_frame.copy()
         image_frame = Image.fromarray(frame)
 
-        image_mask = Image.new("RGBA", (self.__VIDEO_SIZE[0], self.__VIDEO_SIZE[1]), self.roi_color)
+        image_mask = Image.new("RGBA", (VIDEO_SIZE[0], VIDEO_SIZE[1]), self.__roi_color)
         cv2_mask = np.array(image_mask)
         cv2_mask = cv2.cvtColor(cv2_mask, cv2.COLOR_RGBA2BGRA)
         if len(self.region_of_interest_points) > 0:
@@ -186,48 +184,81 @@ class ConfiguratorHandler:
         return frame.tobytes()
 
     def receive_config(self) -> None:
-        """Receives a new configuration from the supported modules."""
-        self.__tracker_config_handler.send(b"REQUEST NONE")
-        config_bytes_tracker: bytes = self.__tracker_config_handler.recv()
-        return_head, data = config_bytes_tracker.split(b" ", 1)
-        if return_head == b"ERROR":
-            raise ValueError(f"Received error from tracker: {data.decode('utf-8')}")
-        config_text_tracker = data.decode("utf-8")
-        config_tracker = loads(config_text_tracker)
+        """Receives the running configuration from the supported modules."""
+        request = {"request_type": "get_config"}
+        self.__send_message_to_tracker(request)
 
-        try:
-            validate(config_tracker, self.__schemas["tracker_config"])
-        except ValidationError as err:
-            self.__tracker_config_handler.send(b"ERROR " + err.message.encode("utf-8"))
+        data = self.__recv_status()
+
+        if data is None or not isinstance(data, dict):
+            error = f"Received data is not a dictionary. It is {type(data)}"
+            self.__send_err(-1, error)
+            raise ValueError(error)
 
         self.region_of_interest_points = []
-        if config_tracker[REGION_OF_INTEREST]:
-            for point in config_tracker[REGION_OF_INTEREST]:
-                if isinstance(point[0], int) and isinstance(point[1], int):
-                    self.region_of_interest_points.append((point[0], point[1]))
         self.__reset_transformation_points()
-        for point_name, point in config_tracker[TRANSFORMATION_POINTS].items():
-            self.add_transformation_point(
-                (point["image"][0], point["image"][1]), (point["real_world"][0], point["real_world"][1]), point_name
-            )
-        self.__tracker_config_handler.send(b"OK NONE")
+
+        if "region_of_interest" in data:
+            for point in data["region_of_interest"]:
+                self.region_of_interest_points.append((point[0], point[1]))
+
+        if "transformation_points" in data.keys():
+            for point_name, point in data["transformation_points"].items():
+                self.add_transformation_point(
+                    (point["image"][0], point["image"][1]), (point["real_world"][0], point["real_world"][1]), point_name
+                )
+
+        self.__send_message_to_tracker({"status": 0})
+
+    def __send_message_to_tracker(self, request: dict):
+        """Sends a message to the tracker.
+
+        Args:
+            request (dict): The request to send.
+        """
+        self.__tracker_config_handler.send(dumps(request).encode("utf-8"))
 
     def send_config(self) -> None:
         """Sends the current configuration to the tracker."""
-        config = {
-            "Region of Interest": self.region_of_interest_points,
-            "Transformation Points": self.configured_transformation_points,
-        }
-        config_text = dumps(config)
-        self.__tracker_config_handler.send(b"UPDATE " + config_text.encode("utf-8"))
-        response = self.__tracker_config_handler.recv()
-        head, data = response.split(b" ", 1)
-        if head == b"ERROR":
-            raise ValueError(f"Received error from tracker: {data.decode('utf-8')}")
-        if head == b"OK":
-            print("Received OK from tracker.")
-        else:
-            raise ValueError(f"Received unknown response from tracker: {response.decode('utf-8')}")
+        payload: dict[str, list[tuple[int, int]] | dict[str, dict[str, tuple[int, int] | tuple[float, float]]]] = {}
+
+        if len(self.region_of_interest_points) > 2:
+            payload["region_of_interest"] = self.region_of_interest_points
+        payload["transformation_points"] = self.configured_transformation_points.copy()
+
+        request = {"request_type": "set_config", "payload": payload}
+
+        self.__send_message_to_tracker(request)
+        self.__recv_status()
+
+    def __send_err(self, code: int, err: str) -> None:
+        response = {"status": code, "message": err}
+
+        self.__send_message_to_tracker(response)
+
+    def __recv_status(self) -> dict | None:
+        """Receives the status and the data from the tracker.
+
+        Returns:
+            tuple[dict | None]: The status and the data.
+        """
+        raw_config: bytes = self.__tracker_config_handler.recv()
+        tracker_response = loads(raw_config)
+
+        try:
+            validate(tracker_response, self.__schemas["response"])
+        except ValidationError as err:
+            self.__send_err(-1, err.message)
+            raise err
+
+        status = tracker_response["status"]
+        data = tracker_response["payload"] if "payload" in tracker_response.keys() else None
+        message = tracker_response["message"] if "message" in tracker_response.keys() else None
+
+        if status != 0:
+            raise ValueError(f"Received error from tracker: {message}")
+
+        return data
 
     def get_real_world_point(self, point: tuple[int, int]) -> tuple[float, float]:
         """Transforms a point from the image to the real world.
@@ -268,7 +299,7 @@ class ConfiguratorHandler:
             self.region_of_interest_points.append((0, 0))
 
         if is_image_coord:
-            np.clip(number, 0, self.__VIDEO_SIZE[coord_index])
+            np.clip(number, 0, VIDEO_SIZE[coord_index])
 
             image_coords_list = list(self.region_of_interest_points[current_index])
             image_coords_list[coord_index] = int(number)
@@ -276,7 +307,7 @@ class ConfiguratorHandler:
             real_coords_tuple = self.get_real_world_point((image_coords[0], image_coords[1]))
             self.region_of_interest_points[current_index] = (image_coords[0], image_coords[1])
         else:
-            np.clip(number, 0, self.__REAL_WORLD_SIZE[coord_index])
+            np.clip(number, 0, REAL_WORLD_SIZE[coord_index])
 
             real_coords_tuple = self.get_real_world_point(self.region_of_interest_points[current_index])
             real_coords = list(real_coords_tuple)
@@ -367,18 +398,18 @@ class ConfiguratorHandler:
         color_index = value_names[input_id]
 
         if len(text) == 0:
-            color_list = list(self.roi_color)
+            color_list = list(self.__roi_color)
             color_list[color_index] = 0
-            self.roi_color = (color_list[0], color_list[1], color_list[2], color_list[3])
+            self.__roi_color = (color_list[0], color_list[1], color_list[2], color_list[3])
         else:
             value = int(text)
             value_clipped = np.clip(value, 0, 255)
 
-            color_list = list(self.roi_color)
+            color_list = list(self.__roi_color)
             color_list[color_index] = value_clipped
-            self.roi_color = (color_list[0], color_list[1], color_list[2], color_list[3])
+            self.__roi_color = (color_list[0], color_list[1], color_list[2], color_list[3])
 
-        return self.roi_color
+        return self.__roi_color
 
     def delete_button_pressed(self, config_name: str) -> None:
         """Deletes a point from the configuration.
@@ -431,7 +462,7 @@ class ConfiguratorHandler:
                 color = (64, 64, 64, 192)
             case "black":
                 color = (0, 0, 0, 255)
-        self.roi_color = color
+        self.__roi_color = color
         return color
 
     def points_drawer_clicked(
@@ -451,7 +482,7 @@ class ConfiguratorHandler:
         Returns:
             PointData: The configured point data.
         """
-        image_coords = self.__calculate_real_point(clicked_point, video_size, full_size)
+        image_coords = self.__calculate_actual_point_on_video(clicked_point, video_size, full_size)
 
         match active_mode:
             case "Region of Interest":
@@ -519,7 +550,7 @@ class ConfiguratorHandler:
         Returns:
             PointData: The clicked point data.
         """
-        image_x, image_y = self.__calculate_real_point(clicked_point, video_size, full_size)
+        image_x, image_y = self.__calculate_actual_point_on_video(clicked_point, video_size, full_size)
         real_x, real_y = self.get_real_world_point((image_x, image_y))
 
         data = PointData(int(image_x), int(image_y), float(real_x), float(real_y))
