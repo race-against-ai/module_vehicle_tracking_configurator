@@ -8,6 +8,7 @@ from vehicle_tracking_configurator.configurator import ConfiguratorHandler
 
 REGION_OF_INTEREST = "Region of Interest"
 TRANSFORMATION_POINTS = "Transformation Points"
+TIME_TRACKING = "Time Tracking"
 
 
 class ModelVehicleTrackingConfigurator(QObject):
@@ -41,11 +42,13 @@ class ModelVehicleTrackingConfigurator(QObject):
             to_update (str): The name of the data to update.
         """
         current_point: int | str
+
         match to_update:
             case "Region of Interest":
                 current_point = int(self.__configurator.current_selected_point[REGION_OF_INTEREST])
                 current_data: tuple[int, int]
                 real_points: tuple[float, float]
+
                 if current_point == len(self.__configurator.region_of_interest_points):
                     current_data = (0, 0)
                     real_points = (0, 0)
@@ -53,13 +56,16 @@ class ModelVehicleTrackingConfigurator(QObject):
                 else:
                     current_data = self.__configurator.region_of_interest_points[current_point]
                     real_points = self.__configurator.get_real_world_point(current_data)
+
                 data = [current_data[0], current_data[1], str(real_points[0]), str(real_points[1])]
                 self.region_of_interest_points_changed_signal.emit(data)
             case "Transformation Points":
                 current_point = str(self.__configurator.current_selected_point[TRANSFORMATION_POINTS])
                 complete_data = self.__configurator.configured_transformation_points[current_point]
+
                 image_coords = complete_data["image"]
                 real_coords = complete_data["real"]
+
                 data = [real_coords[0], real_coords[1], str(image_coords[0]), str(image_coords[1])]
                 self.transformation_points_changed_signal.emit(data)
 
@@ -77,7 +83,7 @@ class ModelVehicleTrackingConfigurator(QObject):
         elif t_point_state:
             self.__active_mode = TRANSFORMATION_POINTS
         elif time_tracking_state:
-            self.__active_mode = "Time Tracking"
+            self.__active_mode = TIME_TRACKING
 
     @Slot(str)  # type: ignore[arg-type]
     def config_button_pressed(self, button_text: str) -> None:
@@ -107,18 +113,20 @@ class ModelVehicleTrackingConfigurator(QObject):
         number = float(text) if len(text) > 0 else 0
 
         match config_name:
+            case "Transformation Points":
+                self.__configurator.transformation_config_text_changed(is_image_coord, coord_index, number)
             case "Region of Interest":
                 image_x, image_y, real_x, real_y = self.__configurator.roi_config_text_changed(
                     is_image_coord, coord_index, number
                 )
+
                 data = [image_x, image_y, str(real_x), str(real_y)]
                 self.region_of_interest_points_changed_signal.emit(data)
-            case "Transformation Points":
-                self.__configurator.transformation_config_text_changed(is_image_coord, coord_index, number)
             case "Real World Coordinate Points":
                 image_x, image_y, real_x, real_y = self.__configurator.real_world_config_text_changed(
                     is_image_coord, coord_index, number
                 )
+
                 data = [image_x, image_y, str(real_x), str(real_y)]
                 self.real_world_points_changed_signal.emit(data)
 
@@ -153,7 +161,9 @@ class ModelVehicleTrackingConfigurator(QObject):
         """
         if config_name == "button":
             config_name = self.__active_mode
+
         new_name, coords = self.__configurator.arrow_button_clicked(config_name, direction)
+
         match config_name:
             case "Region of Interest":
                 self.region_of_interest_point_chosen_signal.emit(new_name)
