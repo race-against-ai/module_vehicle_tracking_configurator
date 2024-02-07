@@ -17,6 +17,8 @@ source = cv2.VideoCapture(str(BASE_DIR / "resources" / "test_video_1.h265"))
 
 pub = pynng.Pub0(listen="ipc:///tmp/RAAI/camera_frame.ipc")
 
+print("Starting Transmission")
+
 while True:
     success, image = source.read()
     if not success:
