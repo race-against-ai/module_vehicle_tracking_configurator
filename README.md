@@ -27,3 +27,7 @@ Before you can start the configurator module, you will have to start the [raai_m
 To start the program using a video file, you will have to [download the video file](#download-pre-recorded-videos-optional) as described above. Then you can start the configurator and use it like normal.
 
 ## Possible Ideas for Improvement
+
+- Make it so that arrow-up and arrow-down can be used to change the selected config. (ROI <-> T-Points <-> Time Tracking)
+- Implement time tracking.
+- Give visual feedback if the config has been sent/received. (sent correctly / error received)
