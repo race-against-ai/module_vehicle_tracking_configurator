@@ -32,6 +32,7 @@ class StreamImageProvider(QQuickImageProvider):
         super().__init__(QQuickImageProvider.Image)  # type: ignore[attr-defined]
         self.img = QImage(width, height, QImage.Format_RGB888)  # type: ignore[attr-defined]
 
+    # Camel case is required by PySide6
     def requestImage(self, frame_id: str, size: QSize, requested_size: QSize) -> QImage:
         """Scales image to the requested size.
 
@@ -93,8 +94,8 @@ class ConfiguratorInterface:
         self.image_count = 0
 
         self.__stop_thread_event = Event()
-        self.__send_next_images_thread = Thread(target=self.__transmit_images_from_backend_to_frontend_worker)
-        self.__send_next_images_thread.start()
+        self.__transmit_images_from_backend_to_frontend_thread = Thread(target=self.__transmit_images_from_backend_to_frontend_worker)
+        self.__transmit_images_from_backend_to_frontend_thread.start()
 
     def __transmit_images_from_backend_to_frontend_worker(self) -> None:
         """A function that constantly sends new images to the UI."""
@@ -111,4 +112,4 @@ class ConfiguratorInterface:
         """Run the QT application."""
         self.__app.exec_()
         self.__stop_thread_event.set()
-        self.__send_next_images_thread.join()
+        self.__transmit_images_from_backend_to_frontend_thread.join()
