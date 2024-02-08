@@ -28,7 +28,13 @@ def main() -> None:
     for file in ls_results:
         file_name = file[::-1]
         file_name = file_name[: file_name.find("/")][::-1]
-        dir_for_file = RESOURCES_DIR
+
+        if RESOURCES_DIR.is_file():
+            raise FileExistsError("A file with the name 'resources' already exists. Can't create the directory.")
+        if not RESOURCES_DIR.exists():
+            RESOURCES_DIR.mkdir()
+
+        dir_for_file = RESOURCES_DIR / file_name
 
         print("Downloading: " + file_name)
         client.download_file(file, dir_for_file)
