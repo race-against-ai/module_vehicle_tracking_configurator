@@ -94,7 +94,9 @@ class ConfiguratorInterface:
         self.image_count = 0
 
         self.__stop_thread_event = Event()
-        self.__transmit_images_from_backend_to_frontend_thread = Thread(target=self.__transmit_images_from_backend_to_frontend_worker)
+        self.__transmit_images_from_backend_to_frontend_thread = Thread(
+            target=self.__transmit_images_from_backend_to_frontend_worker
+        )
         self.__transmit_images_from_backend_to_frontend_thread.start()
 
     def __transmit_images_from_backend_to_frontend_worker(self) -> None:
