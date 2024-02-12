@@ -10,6 +10,7 @@ opencv-python~=4.8.1.78
 pillow~=10.1.0
 webdav4~=0.9.8
 jsonschema~=4.20.0
+numpy~=1.26.4
 
 PySide6-stubs~=6.4.2.0
 opencv-stubs~=0.0.8
