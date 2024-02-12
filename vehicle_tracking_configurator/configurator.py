@@ -63,7 +63,9 @@ class ConfiguratorHandler:
         self.__camera_frame_receiver = Sub0(dial=self.__recv_frames_address, recv_timeout=1000)
         self.__camera_frame_receiver.subscribe(list(self.__recv_frames_topics.values()))
 
-        self.__tracker_config_handler = Req0(dial=self.__recv_tracker_config_address, recv_timeout=1000, send_timeout=1000)
+        self.__tracker_config_handler = Req0(
+            dial=self.__recv_tracker_config_address, recv_timeout=1000, send_timeout=1000
+        )
 
         self.current_selected_point: dict[str, str | int] = {REGION_OF_INTEREST: 0, TRANSFORMATION_POINTS: "top_left"}
         self.__transformation_points = ["top_left", "top_right", "bottom_left", "bottom_right"]
