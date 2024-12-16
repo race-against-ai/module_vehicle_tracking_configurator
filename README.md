@@ -1,71 +1,33 @@
-# RAAI Module Template
-A GitHub Template for creating modular RAAI Components
+# RAAI Module Vehicle Tracking Configurator
 
-## Stuff you need to change
-- Change the ```README.md``` according to your project
-- rename the ```your_project_folder``` to the name of your project
-- edit the ```setup.cfg``` and change `your_project_folder` to the name of your project
-- edit ```.gitattributes``` to the new folder
-- put your GitHub or Volkswagen email in the ```setup.py```
-- import and execute your main file from the project folder into the root ```main.py```
-- adjust the ```pyinstaller.spec``` according to your project (mainly the name)
+## Setup
 
-## Config File
-Adjust the Config file to your needs. The mandatory name convention for it is "[your_project_name]_config.json" <br>
-you can adjust the content in it to your needs
+You need to install all the required packages in the requirements.txt file. It is recommended to use a virtual environment.
 
-#### Pynng:
-If you have Pynng Objects in your code then you need to mark them up in the Config File, an example will already be
-inside the Template
-
-If Topics aren't *needed* in your code then they don't have to be written inside. It probably is very self-explanatory<br>
-There's no limit for the amount of Objects inside the Config but the "publishers" and "subscribers" tab should always be
-inside
-
-Here is the Rough Structure that has to be complied with:
-
-```
-config_file
-└─── "pynng"
-    ├─── "publishers"
-    |     └─── "pub_object_1"
-    |          ├─── "address": ipc adress
-    |          └─── "topics"
-    |               └─── "sudo name": "topic_name"
-    |
-    |
-    └─── "subscribers"
-          ├─── "sub_object_1"
-          |    ├─── "address": ipc adress
-          |    └─── "topics"
-          |         ├─── "whatever you can remember": "foobar"
-          |         └─── "or is easy to use in code": "wha_ever"
-          └─── "sub_object_2"
-               ├─── "address": ipc adress
-               └─── "topics"
-                    └─── "sudo name": "topic_name"
-    
-            
+```bash
+python.exe -m venv venv
+call venv\Scripts\activate.bat
+pip install -r requirements.txt
 ```
 
-## Code Syntax
-To test your code type syntax run
+## Download pre-recorded videos (optional)
 
-```
-tox -e type
-```
+You can use the [download_resources.py](utils/download_resources.py) script to download pre-recorded videos from the NG:ITL cloud. The downloaded files are stored in the [resources](resources) folder.
 
-or to check the style syntax run
-```
-tox -e style
-```
+To use the pre-recorded videos you will need to make sure that no other program is using the `ipc:///tmp/RAAI/camera_frame.ipc` address.
 
-to run a lint check, enter
-```
-tox -e lint_check
-```
+## Starting
 
-To update your code when encountering errors on lint check, just run
-```
-tox -e lint_update
-```
+### Using the Camera Image Stream
+
+Before you can start the configurator module, you will have to start the [raai_module_vehicle_tracking](https://github.com/vw-wob-it-edu-ngitl/raai_module_vehicle_tracking_configurator).
+
+### Using a Video File
+
+To start the program using a video file, you will have to [download the video file](#download-pre-recorded-videos-optional) as described above. Then you can start the configurator and use it like normal.
+
+## Possible Ideas for Improvement
+
+- Make it so that arrow-up and arrow-down can be used to change the selected config. (ROI <-> T-Points <-> Time Tracking)
+- Implement time tracking.
+- Give visual feedback if the config has been sent/received. (sent correctly / error received)

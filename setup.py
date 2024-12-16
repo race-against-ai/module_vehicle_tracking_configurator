@@ -9,16 +9,24 @@ def read(fname):
 
 
 setup(
-    name="raai_module_template",
+    name="raai_module_vehicle_tracking_configurator",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     author="NGITl",
-    author_email="your@email.de",
-    description=("RAAI Module Template for managing different projects for RAAI"),
+    author_email="arne.hilbig@volkswagen.de",
+    description=("RAAI module for configuring the raai_module_vehicle_tracking."),
     license="GPL 3.0",
-    keywords="template",
-    url="https://github.com/vw-wob-it-edu-ngitl/raai_module_template",
+    keywords="vehicle tracking configuration",
+    url="https://github.com/vw-wob-it-edu-ngitl/raai_module_vehicle_tracking_configurator",
     packages=find_packages(),
     long_description=read("README.md"),
-    install_requires=["pynng~=0.7.2"],
+    install_requires=[
+        "pynng~=0.7.2",
+        "PySide6==6.5.3",
+        "opencv-python~=4.8.1.78",
+        "webdav4~=0.9.8",
+        "pillow~=10.1.0",
+        "jsonschema~=4.20.0",
+    ],
+    include_package_data=True,
 )
